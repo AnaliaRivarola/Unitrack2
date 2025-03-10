@@ -1,0 +1,22 @@
+/* Estilo general para el Footer */
+.footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 60px; /* Mismo tamaño que el navbar */
+    background-color: #A0D4DF; /* Mismo color de fondo que el navbar */
+    color: white; /* Color de texto blanco */
+    position: fixed; /* Asegura que el footer quede en la parte inferior */
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000; /* Asegura que el footer esté encima de otros elementos si es necesario */
+  }
+  
+  /* Media query para pantallas pequeñas (móviles) */
+  @media (max-width: 768px) {
+    .footer {
+      height: 50px; /* Ajusta la altura en móviles si es necesario */
+    }
+  }
+  

@@ -1,0 +1,55 @@
+/* Estilo general para el Navbar */
+.main-content {
+  margin-top: 80px; /* Ajusta según la altura de tu navbar */
+}
+
+.navbar {
+  display: fixed;
+  justify-content: center;
+  align-items: center;
+  height: 60px;
+  background-color: #A0D4DF;
+  color: white;
+  padding: 0 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  margin-bottom:100px;
+}
+
+/* Contenedor del logo */
+.navbar-logo-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Logo de la barra de navegación */
+.navbar-logo {
+  max-height: 40px; /* Ajusta el tamaño de la imagen */
+  max-width: 100%;
+}
+
+/* Media query para pantallas pequeñas (móviles) */
+@media (max-width: 768px) {
+  .navbar {
+    padding: 0 10px; /* Menos espacio en los lados para móviles */
+    height: 50px; /* Ajusta la altura en móviles */
+  }
+
+  .navbar-logo {
+    max-height: 30px; /* Ajusta el tamaño del logo en móviles */
+  }
+}
+
+/* Media query para pantallas grandes (escritorio) */
+@media (min-width: 769px) {
+  .navbar {
+    height: 60px; /* Asegura una altura más grande para pantallas grandes */
+  }
+
+  .navbar-logo {
+    max-height: 40px; /* Logo más grande en pantallas grandes */
+  }
+}

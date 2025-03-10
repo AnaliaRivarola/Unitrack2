@@ -1,0 +1,77 @@
+/* Contenedor principal */
+#crear-horario-container {
+  margin: 20px;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Título */
+#crear-horario-title {
+  text-align: center;
+  color: #333;
+  font-size: 1.8em;
+  margin-bottom: 20px;
+}
+
+/* Formulario */
+#crear-horario-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+/* Etiquetas */
+label {
+  font-size: 1.1em;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+/* Campos de entrada */
+.input-field {
+  padding: 10px;
+  font-size: 1em;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
+}
+
+/* Campos de entrada en foco */
+.input-field:focus {
+  border-color: #4caf50;
+  outline: none;
+}
+
+/* Botón */
+#crear-horario-btn {
+  background-color: #4caf50;
+  color: white;
+  padding: 10px 20px;
+  font-size: 1.1em;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+/* Cambio de color del botón al pasar el ratón */
+#crear-horario-btn:hover {
+  background-color: #45a049;
+}
+
+/* Botón deshabilitado */
+button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+/* Estilos para las agrupaciones de campos */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}

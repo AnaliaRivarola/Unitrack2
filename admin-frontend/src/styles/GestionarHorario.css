@@ -1,0 +1,70 @@
+/* Estilos generales */
+#gestion-horarios-container {
+  margin: 20px;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Título */
+#gestion-horarios-title {
+  text-align: center;
+  color: #333;
+  font-size: 1.8em;
+  margin-bottom: 20px;
+}
+
+/* Botón "Crear Horario" */
+#crear-horario-btn {
+  background-color: #4caf50;
+  color: white;
+  padding: 10px 20px;
+  font-size: 1.1em;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-bottom: 20px;
+}
+
+/* Cambio de color del botón al pasar el ratón */
+#crear-horario-btn:hover {
+  background-color: #45a049;
+}
+
+/* Tabla */
+#tabla-horarios {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+/* Cabecera de la tabla */
+th {
+  background-color: #4caf50;
+  color: white;
+  padding: 10px;
+  text-align: left;
+}
+
+/* Filas de la tabla */
+td {
+  padding: 10px;
+  border: 1px solid #ddd;
+}
+
+/* Botones de acciones */
+.action-btn {
+  background-color: #ff9800;
+  margin-right: 10px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.action-btn:hover {
+  background-color: #fb8c00;
+}

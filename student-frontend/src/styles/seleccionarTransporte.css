@@ -1,0 +1,30 @@
+/* seleccionarTransportes.css */
+
+/* Contenedor principal */
+.page-container {
+    padding-top: 80px;
+  }
+  
+  /* Estilos para la lista de transportes */
+  .transport-list {
+    margin: 20px;
+    padding: 10px;
+    text-align: center;
+  }
+  
+  .transport-list h3 {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+  }
+  
+  .transport-list ul {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+  
+  .transport-list li {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+  }
+  

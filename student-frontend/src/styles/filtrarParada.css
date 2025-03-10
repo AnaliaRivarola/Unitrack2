@@ -1,0 +1,83 @@
+/* filtrarParada.css */
+
+/* Contenedor principal de la página */
+.page-container {
+    padding-top: 80px; /* Esto agrega espacio debajo del Navbar */
+  }
+  
+  /* Estilos para el buscador */
+  .search-container {
+    margin: 20px;
+    padding: 10px;
+    text-align: center;
+  }
+  
+  .search-container input {
+    padding: 10px;
+    width: 100%;
+    max-width: 400px;
+    margin-bottom: 10px;
+    border: 0.5px solid #A0D4DF;
+    border-radius: 20px;
+    background-color: rgba(160, 212, 223, 0.3); /* 30% de transparencia */
+
+  }
+  
+  .search-results {
+    margin-top: 10px;
+  }
+  
+  .search-results ul {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+  
+  .search-results li {
+    padding: 5px;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .transport-list {
+    margin-top: 20px;
+  }
+  
+  .transport-list h3 {
+    font-size: 1.2rem;
+    text-align: center;
+  }
+  
+  .transport-list ul {
+    text-align: left;
+  }
+  
+  footer {
+    margin-top: 20px;
+  }
+  
+  .search-results .search-item {
+    display: flex;
+    flex-direction: column; /* Asegura que los elementos estén uno debajo del otro */
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    cursor: pointer;
+  }
+
+  .search-results .parada-nombre {
+    font-weight: bold; /* Hacer el nombre más destacado */
+    margin-bottom: 5px; /* Separar nombre de la ubicación */
+  }
+
+  .search-results .parada-ubicacion {
+    color: #555; /* Color más tenue para la ubicación */
+  }
+
+  .search-results .search-item:hover {
+    background-color: rgba(160, 212, 223, 0.3); /* Color al pasar el cursor por encima */
+  }
+  @media (max-width: 768px) {
+    .search-container input {
+      max-width: 90%;
+    }
+  }
+  
