@@ -1,7 +1,7 @@
-// admin-frontend/vite.config.js
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
+import path from 'path'; // Importar el módulo 'path'
 
 export default defineConfig({
   server: {
@@ -33,4 +33,10 @@ export default defineConfig({
       },
     }),
   ],
+  resolve: {
+    alias: {
+      // Ajusta la ruta de 'shared-frontend' según tu estructura de directorios
+      'shared-frontend': path.resolve(__dirname, '../shared-frontend'), // <-- Esta es la clave
+    },
+  },
 });
