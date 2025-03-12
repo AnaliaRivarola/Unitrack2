@@ -7,14 +7,16 @@ import io from "socket.io-client";
 import L from "leaflet";
 import markerIcon from "../assets/icono2.png"; 
 import studentIcon from "../assets/student.png"; 
+import paradaIcon from "../assets/parada.png";
 import Sidebar from "./sideBar"; // Importa el sidebar
 import '../styles/mapa.css';  // Importa el archivo CSS
+import axios from "axios";  // Asegúrate de importar axios para las solicitudes HTTP
 
 const socket = io("http://localhost:5000");
 
 const busIcon = L.icon({
   iconUrl: markerIcon,
-  iconSize: [27, 50],
+  iconSize: [27, 55],
   iconAnchor: [20, 40],
   popupAnchor: [0, -40]
 });
@@ -25,6 +27,14 @@ const studentLocationIcon = L.icon({
   iconSize: [30, 30],  
   iconAnchor: [15, 15], 
   popupAnchor: [0, -15] 
+});
+
+// Icono personalizado para las paradas
+const stopIcon = L.icon({
+  iconUrl: paradaIcon, // Reemplázalo con el icono que desees
+  iconSize: [30, 40],
+  iconAnchor: [15, 15],
+  popupAnchor: [0, -15]
 });
 
 const ChangeView = ({ center }) => {
@@ -43,6 +53,21 @@ export const MapView = () => {
   const [noData, setNoData] = useState(false);
   const [lastUpdate, setLastUpdate] = useState(Date.now());
   const [studentLocation, setStudentLocation] = useState(null);
+  const [stops, setStops] = useState([]); // Estado para almacenar las paradas
+
+  // Obtener las paradas desde el backend
+  useEffect(() => {
+    const fetchStops = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/paradas"); // Ajusta la URL según tu API
+        setStops(response.data); // Asume que la API devuelve un array de paradas
+      } catch (error) {
+        console.error("Error al obtener las paradas:", error);
+      }
+    };
+
+    fetchStops(); // Llamada para obtener las paradas al cargar el componente
+  }, []);
 
   useEffect(() => {
     const timeout = setInterval(() => {
@@ -120,6 +145,7 @@ export const MapView = () => {
       alert("Geolocalización no soportada por este navegador");
     }
   }, []);
+
   return (
     <div>
       <Navbar logoSrc="../src/assets/logoLetra.png" altText="Logo" />
@@ -140,9 +166,20 @@ export const MapView = () => {
         {/* Mostrar la ubicación del estudiante en el mapa */}
         {studentLocation && (
           <Marker position={studentLocation} icon={studentLocationIcon}>
-            <Popup>Ubicación del Estudiante</Popup>
+            <Popup>
+              {"Tu estas aqui!"}
+              <br />
+              {"Que te vaya bien en tus clases el dia de hoy"}
+            </Popup>
           </Marker>
         )}
+
+        {/* Mostrar las paradas en el mapa */}
+        {stops.map((stop) => (
+          <Marker key={stop._id} position={[stop.ubicacion.latitud, stop.ubicacion.longitud]} icon={stopIcon}>
+            <Popup>Nombre: {stop.nombre}</Popup>
+          </Marker>
+        ))}
       </MapContainer>
 
       {/* Botón flotante */}

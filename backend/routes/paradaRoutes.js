@@ -5,7 +5,7 @@ const ParadaController = require('../controllers/ParadaController');
 const Parada = require('../models/parada.models');
 
 // Ruta para obtener todas las paradas
-router.get('/paradas', async (req, res) => {  // Ahora está en /api/paradas
+router.get('/paradas', async (req, res) => {
   try {
     await ParadaController.getParadas(req, res);
   } catch (error) {
@@ -14,7 +14,7 @@ router.get('/paradas', async (req, res) => {  // Ahora está en /api/paradas
 });
 
 // Ruta para crear una parada
-router.post('/paradas', async (req, res) => {  // Ahora está en /api/paradas
+router.post('/paradas', async (req, res) => {
   try {
     await ParadaController.createParada(req, res);
   } catch (error) {
@@ -33,26 +33,39 @@ router.delete('/paradas/:id', async (req, res) => {
   }
 });
 
-router.get('/paradas/:id', (req, res) => {
-  const { id } = req.params;
-  Parada.findById(id)
-    .then(parada => {
-      if (!parada) {
-        return res.status(404).json({ message: 'Parada no encontrada' });
-      }
-      res.json(parada);
-    })
-    .catch(err => res.status(500).json({ message: 'Error al obtener la parada', error: err }));
+// Ruta para obtener una parada por ID
+router.get('/paradas/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const parada = await Parada.findById(id);
+
+    if (!parada) {
+      return res.status(404).json({ message: 'Parada no encontrada' });
+    }
+
+    res.json(parada);
+  } catch (error) {
+    res.status(500).json({ message: 'Error al obtener la parada', error: error.message });
+  }
 });
 
+// Ruta para actualizar una parada
 router.put('/paradas/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const { nombre, ubicacion } = req.body;
-    
+
+    if (!ubicacion || !ubicacion.latitud || !ubicacion.longitud) {
+      return res.status(400).json({ message: 'Latitud y longitud son requeridos' });
+    }
+
     // Actualizar la parada
-    const parada = await Parada.findByIdAndUpdate(id, { nombre, ubicacion }, { new: true });
-    
+    const parada = await Parada.findByIdAndUpdate(
+      id,
+      { nombre, ubicacion: { latitud: ubicacion.latitud, longitud: ubicacion.longitud } },
+      { new: true }
+    );
+
     if (!parada) {
       return res.status(404).json({ message: 'Parada no encontrada' });
     }

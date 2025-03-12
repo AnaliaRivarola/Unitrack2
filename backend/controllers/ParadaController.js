@@ -5,9 +5,16 @@ exports.createParada = async (req, res) => {
   const { nombre, ubicacion } = req.body;
 
   try {
+    if (!ubicacion || !ubicacion.latitud || !ubicacion.longitud) {
+      return res.status(400).json({ message: "Latitud y longitud son requeridos" });
+    }
+
     const nuevaParada = new Parada({
       nombre,
-      ubicacion,
+      ubicacion: {
+        latitud: ubicacion.latitud,
+        longitud: ubicacion.longitud,
+      },
     });
 
     await nuevaParada.save();

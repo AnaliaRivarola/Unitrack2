@@ -42,10 +42,10 @@ export const GestionarParadas = () => {
 
   return (
     <div className="gestionar-paradas-container">
-      <Navbar logoSrc="../src/assets/logoLetra.png" altText="Logo" /><Navbar logoSrc="../src/assets/logoLetra.png" altText="Logo" />
+      <Navbar logoSrc="../src/assets/logoLetra.png" altText="Logo" />
       <div className="header">
         <h1>Gestionar Paradas</h1>
-        <button onClick={() => navigate('/crear-parada')} className="crear-parada-btn">
+        <button onClick={() => navigate('/admin/crear-parada')} className="crear-parada-btn">
           Crear Parada
         </button>
       </div>
@@ -57,7 +57,8 @@ export const GestionarParadas = () => {
               <li key={parada._id} className="parada-item">
                 <div className="parada-info">
                   <h3>{parada.nombre}</h3>
-                  <p>{parada.ubicacion}</p>
+                  {/* Accede a las propiedades latitud y longitud */}
+                  <p>Latitud: {parada.ubicacion.latitud}, Longitud: {parada.ubicacion.longitud}</p>
                 </div>
                 <div className="acciones">
                   <button onClick={() => navigate(`/ver-parada/${parada._id}`)} className="accion-btn ver-btn">
@@ -77,7 +78,7 @@ export const GestionarParadas = () => {
           <p>No hay paradas disponibles.</p>
         )}
       </div>
-       <Footer /> {/* Coloca el Footer en la parte inferior */}
+      <Footer /> {/* Coloca el Footer en la parte inferior */}
     </div>
   );
 };
