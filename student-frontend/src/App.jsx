@@ -6,6 +6,8 @@ import { MapView } from './views/map';
 import SeleccionarTransporte from './views/seleccionarTransporte';  // Importar SeleccionarTransporte
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import "leaflet/dist/leaflet.css";
+import HorariosDisponibles from "../src/views/verHorarios"; // Ajusta la ruta si es necesario
+import "bootstrap/dist/css/bootstrap.min.css"; // Importar estilos de Bootstrap
 
 function App() {
   const [count, setCount] = useState(0);
@@ -26,6 +28,7 @@ function App() {
         <Route path="/filtrarParada" element={<FiltrarParada />} />
         <Route path="/seleccionarTransporte/:paradaId" element={<SeleccionarTransporte />} />
         <Route path="/mapa" element={<MapView />} />
+        <Route path="/horarios" element={<HorariosDisponibles />} />
       </Routes>
     </Router>
   );

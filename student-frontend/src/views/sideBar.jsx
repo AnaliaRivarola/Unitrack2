@@ -1,26 +1,68 @@
-import React, { useState } from "react";
+import React from "react";
+import { useNavigate } from "react-router-dom"; // Importa useNavigate para navegación programática
+import "bootstrap/dist/css/bootstrap.min.css";
 import "../styles/sideBar.css"; // Importar el CSS
+import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
 const Sidebar = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate(); // Inicializa useNavigate
+
+  // Función para manejar la redirección al hacer clic en el botón
+  const handleNavigate = () => {
+    navigate("/horarios"); // Redirige a /horarios
+  };
 
   return (
-    <div className="sidebar-container">
-      {/* Sidebar */}
-      <div className={`sidebar ${isOpen ? "open" : ""}`}>
-        <h2>Menú</h2>
-        <ul>
-          <li><a href="#">Opción 1</a></li>
-          <li><a href="#">Opción 2</a></li>
-          <li><a href="#">Opción 3</a></li>
-        </ul>
-      </div>
-
-      {/* Botón flotante para abrir el sidebar */}
-      <button className={`sidebar-toggle ${isOpen ? "open" : ""}`} onClick={() => setIsOpen(!isOpen)}>
+    <>
+      {/* Botón flotante para abrir el Sidebar */}
+      <button
+        className="sidebar-toggle"
+        type="button"
+        data-bs-toggle="offcanvas"
+        data-bs-target="#sidebarMenu"
+        aria-controls="sidebarMenu"
+      >
         ☰
       </button>
-    </div>
+
+      {/* Sidebar con Bootstrap Offcanvas */}
+      <div
+        className="offcanvas offcanvas-start"
+        tabIndex="-1"
+        id="sidebarMenu"
+        aria-labelledby="sidebarMenuLabel"
+      >
+        <div className="offcanvas-header">
+          <h5 className="offcanvas-title" id="sidebarMenuLabel">Menú</h5>
+          <button
+            type="button"
+            className="btn-close"
+            data-bs-dismiss="offcanvas"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div className="offcanvas-body">
+          <ul className="list-group">
+            <li className="list-group-item">
+              {/* Botón para redirigir a /horarios */}
+              <button
+                className="btn btn-light w-100 text-start"
+                onClick={handleNavigate} // Usamos onClick para redirigir
+                data-bs-dismiss="offcanvas"
+              >
+                Ver Horarios
+              </button>
+            </li>
+            <li className="list-group-item">
+              <a href="#" className="text-decoration-none" data-bs-dismiss="offcanvas">Opción 2</a>
+            </li>
+            <li className="list-group-item">
+              <a href="#" className="text-decoration-none" data-bs-dismiss="offcanvas">Opción 3</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </>
   );
 };
 

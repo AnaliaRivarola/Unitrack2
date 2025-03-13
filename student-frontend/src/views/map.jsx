@@ -166,7 +166,7 @@ export const MapView = () => {
 
   return (
     <div>
-      <Navbar logoSrc="../src/assets/logoLetra.png" altText="Logo" />
+      {/*<Navbar logoSrc="../src/assets/logoLetra.png" altText="Logo" />*/}
       <ChoferEsperaModal show={showModal} setShow={setShowModal} />
       <MapContainer key={`${position.lat}-${position.lng}`} center={position} zoom={15} style={{ height: "calc(100vh - 60px)", width: "100%" }}>
         <Sidebar />
