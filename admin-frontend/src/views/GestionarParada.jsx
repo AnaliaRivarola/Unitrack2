@@ -61,9 +61,6 @@ export const GestionarParadas = () => {
                   <p>Latitud: {parada.ubicacion.latitud}, Longitud: {parada.ubicacion.longitud}</p>
                 </div>
                 <div className="acciones">
-                  <button onClick={() => navigate(`/ver-parada/${parada._id}`)} className="accion-btn ver-btn">
-                    Ver
-                  </button>
                   <button onClick={() => navigate(`/admin/editar-parada/${parada._id}`)} className="accion-btn editar-btn">
                     Editar
                   </button>

@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom'; // Para obtener el id de la URL y redirigir después
 import '../styles/CrearHorario.css';
 import axios from 'axios';
-import { useParams, useHistory } from 'react-router-dom';
 
 export const EditarHorario = () => {
-  const { id } = useParams(); // Obtenemos el ID del horario desde la URL
-  const history = useHistory(); // Para redirigir después de guardar
-
   const [transportes, setTransportes] = useState([]); // Lista de transportes
   const [formData, setFormData] = useState({
     id_transporte: '',
@@ -14,6 +11,8 @@ export const EditarHorario = () => {
     hora_regreso: '',
     origen: '',
   });
+  const { id } = useParams(); // Obtener el id del horario de la URL
+  const navigate = useNavigate(); // Para redirigir a otra página después de guardar
 
   // Obtener transportes al montar el componente
   useEffect(() => {
@@ -25,24 +24,25 @@ export const EditarHorario = () => {
         console.error('Error al obtener transportes:', error);
       }
     };
-
-    fetchTransportes();
-  }, []);
-
-  // Obtener los detalles del horario a editar
-  useEffect(() => {
+  
     const fetchHorario = async () => {
       try {
         const response = await axios.get(`http://localhost:5000/api/horarios/${id}`);
-        setFormData(response.data); // Cargar los datos del horario en el formulario
+        // Asegurarse de que el transporte es el correcto
+        const horario = response.data;
+        setFormData({
+          id_transporte: horario.id_transporte._id,  // Asegúrate de que estamos obteniendo el id del transporte correctamente
+          hora_salida: horario.hora_salida,
+          hora_regreso: horario.hora_regreso,
+          origen: horario.origen,
+        });
       } catch (error) {
         console.error('Error al obtener el horario:', error);
       }
     };
-
-    if (id) {
-      fetchHorario();
-    }
+  
+    fetchTransportes();
+    fetchHorario(); // Llamar a la función para obtener el horario
   }, [id]);
 
   // Manejar cambios en los campos del formulario
@@ -51,18 +51,19 @@ export const EditarHorario = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  // Enviar formulario para actualizar el horario
+  // Enviar formulario para editar horario
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`http://localhost:5000/api/horarios/${id}`, formData); // Usamos PUT para actualizar
-      alert('Horario actualizado exitosamente');
-      history.push('/horarios'); // Redirigir a la lista de horarios después de guardar
+      await axios.put(`http://localhost:5000/api/horarios/${id}`, formData); // Usar PUT para editar
+      alert('Horario editado exitosamente');
+      navigate('/admin/gestionar-horarios'); // Redirigir a la lista de horarios
     } catch (error) {
-      console.error('Error al actualizar el horario:', error);
-      alert('Hubo un problema al actualizar el horario');
+      console.error('Error al editar horario:', error);
+      alert('Hubo un problema al editar el horario');
     }
   };
+  
 
   return (
     <div id="crear-horario-container">
@@ -126,10 +127,8 @@ export const EditarHorario = () => {
           />
         </div>
 
-        <button type="submit" id="crear-horario-btn">Actualizar Horario</button>
+        <button type="submit" id="crear-horario-btn">Editar Horario</button>
       </form>
     </div>
   );
 };
-
-export default EditarHorario;

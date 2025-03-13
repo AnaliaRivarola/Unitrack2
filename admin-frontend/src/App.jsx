@@ -11,6 +11,7 @@ import { CrearHorario } from './views/CrearHorario';
 import GestionarHorarios from './views/GestionarHorario';
 import { TransporteList } from './views/gestionarTransporte';
 import { CrearTransporte } from "./views/CrearTransporte";
+import { EditarHorario } from './views/EditHorario'; 
 
 import './App.css';
 import axios from 'axios';
@@ -42,6 +43,7 @@ function App() {
         <Route path="/admin/gestionar-horarios" element={<GestionarHorarios />} />
         <Route path="/admin/gestionar-transporte" element={<TransporteList />} />
         <Route path="/admin/crear-transporte" element={<CrearTransporte />} />
+        <Route path="/admin/editar-horario/:id" element={<EditarHorario />} />
       </Routes>
     </Router>
   );
