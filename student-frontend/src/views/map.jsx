@@ -5,6 +5,8 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import io from "socket.io-client";
 import L from "leaflet";
+import { Modal, Button } from "react-bootstrap";
+import ChoferEsperaModal from "../components/modal/choferEspera";
 import markerIcon from "../assets/icono2.png"; 
 import studentIcon from "../assets/student.png"; 
 import paradaIcon from "../assets/parada.png";
@@ -53,7 +55,20 @@ export const MapView = () => {
   const [noData, setNoData] = useState(false);
   const [lastUpdate, setLastUpdate] = useState(Date.now());
   const [studentLocation, setStudentLocation] = useState(null);
-  const [stops, setStops] = useState([]); // Estado para almacenar las paradas
+  const [stops, setStops] = useState([]); // Estado para almacenar las paradas]
+  const [showModal, setShowModal] = useState(false);
+
+  //chofer espera 
+  useEffect(() => {
+    socket.on("choferEsperara", () => {
+      console.log("Evento 'choferEsperara' recibido");
+      setShowModal(true);  // Mostrar el modal cuando el chofer confirme
+    });
+  
+    return () => {
+      socket.off("choferEsperara");
+    };
+  }, []);
 
   // Obtener las paradas desde el backend
   useEffect(() => {
@@ -104,14 +119,18 @@ export const MapView = () => {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
-          console.log("Ubicación del estudiante obtenida:", { lat: latitude, lng: longitude });
-          setStudentLocation({ lat: latitude, lng: longitude }); // Actualizar la ubicación del estudiante
-
+          console.log("🎒 Ubicación del estudiante obtenida:", { lat: latitude, lng: longitude });
+  
+          setStudentLocation({ lat: latitude, lng: longitude }); 
+  
+          // Enviar la ubicación al servidor con identificador
           socket.emit("ubicacionEstudiante", {
             latitud: latitude,
             longitud: longitude,
+            tipo: "ubicacion_estudiante" // 🔹 Identificador para la ubicación del estudiante
           });
-          console.log("Ubicación enviada al conductor:", { lat: latitude, lng: longitude });
+  
+          console.log("🚀 Ubicación del estudiante enviada al conductor:", { lat: latitude, lng: longitude });
         },
         (err) => {
           console.error("No se pudo obtener la ubicación", err);
@@ -119,7 +138,6 @@ export const MapView = () => {
       );
     } else {
       console.log("Geolocalización no soportada por este navegador");
-      alert("Geolocalización no soportada por este navegador");
     }
   };
 
@@ -149,7 +167,7 @@ export const MapView = () => {
   return (
     <div>
       <Navbar logoSrc="../src/assets/logoLetra.png" altText="Logo" />
-      
+      <ChoferEsperaModal show={showModal} setShow={setShowModal} />
       <MapContainer key={`${position.lat}-${position.lng}`} center={position} zoom={15} style={{ height: "calc(100vh - 60px)", width: "100%" }}>
         <Sidebar />
         <ChangeView center={position} />

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';  // Asegúrate de importar ambos
-import reactLogo from './assets/react.svg';
-import viteLogo from '/vite.svg';
-import './App.css';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { MapView } from "./views/mapChofer";
+import "bootstrap/dist/css/bootstrap.min.css";
 import axios from 'axios';
 
 function App() {
@@ -18,11 +18,13 @@ function App() {
   }, []); // Asegúrate de que useEffect esté dentro de la función del componente
 
   return (
-    <>
-      <div>
-        <h3>Front del chofer</h3>
-      </div>
-    </>
+    <Router>
+      <Routes>
+
+        <Route path="/chofer/mapa" element={<MapView />} />
+        
+      </Routes>
+    </Router>
   );
 }
 

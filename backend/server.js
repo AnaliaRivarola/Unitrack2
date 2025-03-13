@@ -56,16 +56,29 @@ const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server, {
   cors: {
-    origin: "*", // Permitir conexiones desde cualquier origen
-    methods: ["GET", "POST"]
+    origin: "*", // Permite todas las conexiones (puedes cambiarlo por una URL específica si es necesario)
+    methods: ["GET", "POST"],
+    allowedHeaders: ["Content-Type"],
+    credentials: true,  // Habilitar credenciales si las necesitas
   }
 });
-
 // 3. Escuchar eventos de conexión y desconexión de clientes WebSocket
 io.on("connection", (socket) => {
   console.log("🔗 Nuevo cliente conectado:", socket.id);
 
-  // Escuchar cuando un cliente se desconecta
+  // Escuchar ubicación del estudiante y reenviar a los conductores
+  socket.on("ubicacionEstudiante", (data) => {
+    console.log("📥 Ubicación del estudiante recibida en el servidor:", data);
+    io.emit("ubicacionEstudiante", data); // Reenviar a todos los conductores
+  });
+
+  // Escuchar cuando el chofer confirma que esperará al estudiante
+  socket.on("choferEsperara", (data) => {
+    console.log("🟢 Chofer esperará al estudiante en:", data);
+    io.emit("choferEsperara", data); // Enviar evento a los estudiantes
+  });
+
+  // Manejo de desconexión
   socket.on("disconnect", () => {
     console.log("❌ Cliente desconectado:", socket.id);
   });
@@ -111,6 +124,7 @@ const obtenerUbicacionDesdeFlespi = async () => {
       const ubicacion = {
         latitud,
         longitud,
+        tipo: "gps_transporte", // 🔹 Identificador para el GPS
         timestamp
       };
 
