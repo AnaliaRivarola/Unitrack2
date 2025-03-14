@@ -1,53 +1,96 @@
 .crear-parada-container {
-    max-width: 500px;
-    margin: 0 auto;
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background-color: #f9f9f9;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 24px;
+  color: #333;
+}
+
+.crear-parada-form .form-group {
+  margin-bottom: 15px;
+}
+
+.crear-parada-form label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #333;
+}
+
+.crear-parada-form input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #333;
+}
+
+.crear-parada-form button {
+  width: 100%;
+  padding: 12px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.crear-parada-form button:hover {
+  background-color: #0056b3;
+}
+
+/* Estilos para el contenedor del mapa */
+.crear-parada-form .map-container {
+  margin-bottom: 20px;
+  position: relative;
+  height: 400px; /* Ajusta la altura según lo necesites */
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.crear-parada-form .map-container .leaflet-container {
+  border-radius: 4px;
+}
+
+.crear-parada-form .map-container label {
+  position: absolute;
+  top: 10px;
+  left: 15px;
+  background-color: rgba(255, 255, 255, 0.7);
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.crear-parada-form .form-group input[disabled] {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.message {
+  margin-top: 15px;
+  text-align: center;
+  font-size: 14px;
+  color: green;
+}
+
+@media (max-width: 768px) {
+  .crear-parada-container {
+    padding: 15px;
   }
-  
-  h1 {
-    text-align: center;
-    margin-bottom: 20px;
-  }
-  
-  .crear-parada-form .form-group {
-    margin-bottom: 15px;
-  }
-  
-  .crear-parada-form label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-  }
-  
-  .crear-parada-form input {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-  
+
   .crear-parada-form button {
-    width: 100%;
-    padding: 10px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    font-size: 16px;
-    cursor: pointer;
-  }
-  
-  .crear-parada-form button:hover {
-    background-color: #0056b3;
-  }
-  
-  .message {
-    margin-top: 15px;
-    text-align: center;
+    padding: 12px;
     font-size: 14px;
-    color: green;
   }
-  
+}

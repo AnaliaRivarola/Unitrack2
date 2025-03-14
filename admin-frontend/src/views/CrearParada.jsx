@@ -1,13 +1,66 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import L from 'leaflet'; 
 import axios from 'axios';
-import '../styles/CrearParada.css'; // Mantén los estilos originales
+import { useNavigate } from 'react-router-dom';  // Importa useNavigate
+import '../styles/CrearParada.css';
+import "leaflet/dist/leaflet.css";
 
 export const CrearParada = () => {
   const [formData, setFormData] = useState({
     nombre: '',
-    ubicacion: { latitud: '', longitud: '' }, // Campos de latitud y longitud vacíos inicialmente
+    ubicacion: { latitud: '', longitud: '' },
   });
   const [message, setMessage] = useState('');
+  const [userLocation, setUserLocation] = useState(null);  // Estado para guardar la ubicación del usuario
+
+  const navigate = useNavigate();  // Crea una instancia de useNavigate
+
+  // Usamos useRef para mantener una referencia del contenedor del mapa
+  const mapRef = useRef(null);
+
+  useEffect(() => {
+    // Obtener la ubicación del usuario
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setUserLocation({ lat: latitude, lng: longitude });
+        },
+        (error) => {
+          console.error('Error al obtener la ubicación', error);
+          setMessage('No se pudo obtener la ubicación.');
+        }
+      );
+    } else {
+      setMessage('Geolocalización no soportada en este navegador.');
+    }
+  }, []); // Solo se ejecuta una vez cuando el componente se monta
+
+  useEffect(() => {
+    // Verifica si el mapa ya ha sido inicializado
+    if (mapRef.current && userLocation) {
+      const map = L.map(mapRef.current).setView([userLocation.lat, userLocation.lng], 13); // Inicializa el mapa en la ubicación del usuario
+
+      // Carga el mapa con OpenStreetMap como capa base
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+      // Aquí puedes agregar el marcador y manipular el mapa según sea necesario
+      map.on('click', (e) => {
+        const { lat, lng } = e.latlng;
+        setFormData({
+          ...formData,
+          ubicacion: { latitud: lat, longitud: lng },
+        });
+        // Añadir un marcador en la posición seleccionada
+        L.marker([lat, lng]).addTo(map);
+      });
+
+      // Limpiar mapa cuando el componente se desmonte
+      return () => {
+        map.remove();
+      };
+    }
+  }, [userLocation]); // Se ejecuta cada vez que la ubicación del usuario cambia
 
   // Función para manejar cambios en los campos de texto
   const handleChange = (e) => {
@@ -21,7 +74,10 @@ export const CrearParada = () => {
     try {
       const response = await axios.post('http://localhost:5000/api/paradas', formData);
       setMessage('Parada creada exitosamente.');
-      setFormData({ nombre: '', ubicacion: { latitud: '', longitud: '' } }); // Restablece el formulario
+      setFormData({ nombre: '', ubicacion: { latitud: '', longitud: '' } });
+
+      // Redirigir al usuario a /admin/gestionar-paradas después de crear la parada
+      navigate('/admin/gestionar-paradas');
     } catch (error) {
       console.error('Error al crear la parada:', error.response ? error.response.data : error.message);
       setMessage('Hubo un error al crear la parada.');
@@ -43,6 +99,9 @@ export const CrearParada = () => {
             required
           />
         </div>
+
+        {/* El contenedor del mapa */}
+        <div className="map-container" ref={mapRef} style={{ height: '400px' }}></div>
 
         {/* Campos para ingresar las coordenadas manualmente */}
         <div className="form-group">
