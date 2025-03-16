@@ -14,8 +14,11 @@ import paradaIcon from "../assets/parada.png";
 import Sidebar from "./sideBar"; 
 import '../styles/mapa.css';  
 import axios from "axios";  
+import { useParams } from "react-router-dom";
+
 
 const socket = io("http://localhost:5000");
+
 
 const busIcon = L.icon({
   iconUrl: markerIcon,
@@ -61,6 +64,20 @@ export const MapView = () => {
   const [mensajeChofer, setMensajeChofer] = useState("");
   const [showMensajeModal, setShowMensajeModal] = useState(false);
 
+// 📌 Estado para almacenar el transporte seleccionado
+const [selectedTransporte, setSelectedTransporte] = useState(null);
+
+const { coban_id } = useParams();
+
+useEffect(() => {
+  // Lógica para seleccionar el transporte con el coban_id
+  if (coban_id) {
+    setSelectedTransporte(coban_id);  // Establecer el transporte seleccionado con el coban_id recibido
+    console.log("Transporte seleccionado:", coban_id);
+  }
+}, [coban_id]); 
+
+
   useEffect(() => {
     socket.on("choferEsperara", () => {
       console.log("Evento 'choferEsperara' recibido");
@@ -88,33 +105,55 @@ export const MapView = () => {
   useEffect(() => {
     const timeout = setInterval(() => {
       if (Date.now() - lastUpdate > 30000) {
-        setNoData(true);
+        setNoData(true); // Si han pasado más de 30 segundos sin actualización
       }
-    }, 10000);
-
+    }, 10000); // Se ejecuta cada 10 segundos
+  
     socket.on("ubicacionActualizada", (data) => {
       console.log("📍 Nueva ubicación recibida:", data);
-      if (data.latitud && data.longitud) {
-        setPosition((prevPos) => {
-          if (prevPos.lat !== data.latitud || prevPos.lng !== data.longitud) {
-            setNoData(false);
-            setLastUpdate(Date.now());
-            return { lat: data.latitud, lng: data.longitud };
-          }
-          return prevPos;
-        });
+  
+      if (!data) {
+        console.error("❌ Error: No se recibió ningún dato en 'ubicacionActualizada'.");
+        return;
+      }
+  
+      console.log("🔍 Claves disponibles en data:", Object.keys(data));
+  
+      if (!data.device) {
+        console.error("⚠️ Error: No se recibió un 'device' válido en los datos.");
+        return;
+      }
+  
+      console.log("🔍 device recibido:", data.device);
+      console.log("🔍 selectedTransporte:", selectedTransporte);
+  
+      // Asegurémonos de que el `selectedTransporte` tiene el valor correcto
+      if (selectedTransporte && String(data.device) === String(selectedTransporte)) {
+        if (typeof data.latitud === "number" && typeof data.longitud === "number") {
+          console.log("✅ Transporte coincide, actualizando ubicación...");
+          setPosition({
+            lat: data.latitud,
+            lng: data.longitud,
+          });
+          setNoData(false);
+          setLastUpdate(Date.now());
+        } else {
+          console.error("⚠️ Datos de ubicación incompletos o inválidos:", data);
+        }
       } else {
-        console.error("⚠️ Datos inválidos recibidos:", data);
+        console.warn(`⚠️ El 'device' recibido (${data.device}) no coincide con el transporte seleccionado (${selectedTransporte}).`);
       }
     });
-
+  
     return () => {
       socket.off("ubicacionActualizada");
-      clearInterval(timeout);
     };
-  }, [lastUpdate]);
+  }, [lastUpdate, selectedTransporte]); // Dependencia de selectedTransporte
 
-  // 📌 Escuchar los mensajes del chofer
+  useEffect(() => {
+    console.log("🚍 selectedTransporte actualizado:", selectedTransporte);
+  }, [selectedTransporte]);
+
   useEffect(() => {
     socket.on("mensaje-estudiante", (mensaje) => {  // Cambia 'mensajeChofer' a 'mensaje-estudiante'
       console.log("📨 Mensaje recibido del chofer:", mensaje);
@@ -127,7 +166,6 @@ export const MapView = () => {
     };
   }, []);
 
-
   const handleSendLocation = () => {
     if (navigator.geolocation) {
       console.log("Solicitando ubicación...");
@@ -139,6 +177,7 @@ export const MapView = () => {
           setStudentLocation({ lat: latitude, lng: longitude }); 
   
           socket.emit("ubicacionEstudiante", {
+            device_id: selectedTransporte, 
             latitud: latitude,
             longitud: longitude,
             tipo: "ubicacion_estudiante"
@@ -177,6 +216,7 @@ export const MapView = () => {
       alert("Geolocalización no soportada por este navegador");
     }
   }, []);
+
 
   return (
     <div>

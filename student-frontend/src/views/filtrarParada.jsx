@@ -1,81 +1,98 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom'; // Importar useNavigate
-//import { Navbar } from 'shared-frontend/components/Navbar';
-//import { Footer } from 'shared-frontend/components/Footer';
+import { useNavigate } from 'react-router-dom';
 import "../styles/filtrarParada.css";
+import { Container, Row, Col, Form, InputGroup, ListGroup, Alert } from 'react-bootstrap';
 
 function FiltrarParada() {
-  const [paradas, setParadas] = useState([]); // Lista completa de paradas
-  const [searchTerm, setSearchTerm] = useState(''); // Término de búsqueda
-  const [filteredParadas, setFilteredParadas] = useState([]); // Paradas filtradas
-  const navigate = useNavigate(); // Inicializar el hook de navegación
+  const [paradas, setParadas] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filteredParadas, setFilteredParadas] = useState([]);
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
-  // Obtener paradas al cargar la página
+  // Obtener paradas desde la API
   useEffect(() => {
     axios.get('http://localhost:5000/api/paradas')
       .then(response => {
         setParadas(response.data);
-        setFilteredParadas(response.data); // Inicialmente, todas las paradas están filtradas
+        setFilteredParadas(response.data);
       })
-      .catch(error => console.error('Error al obtener paradas:', error));
+      .catch(error => {
+        console.error('Error al obtener paradas:', error);
+        setError('No se pudieron cargar las paradas. Intenta nuevamente más tarde.');
+      });
   }, []);
 
-  // Filtrar las paradas según el término de búsqueda
+  // Filtrar las paradas
   useEffect(() => {
     if (searchTerm === '') {
-      setFilteredParadas(paradas); // Si no hay término de búsqueda, mostrar todas las paradas
+      setFilteredParadas(paradas);
     } else {
+      const lowercasedSearchTerm = searchTerm.toLowerCase();
       setFilteredParadas(
         paradas.filter(parada => 
-          parada.nombre.toLowerCase().includes(searchTerm.toLowerCase()) || 
-          parada.ubicacion.toLowerCase().includes(searchTerm.toLowerCase())
+          parada.nombre.toLowerCase().includes(lowercasedSearchTerm) ||
+          parada.ubicacion.latitud.toString().includes(lowercasedSearchTerm) || 
+          parada.ubicacion.longitud.toString().includes(lowercasedSearchTerm)
         )
       );
     }
   }, [searchTerm, paradas]);
 
-  // Función para manejar la selección de una parada
+  // Redirigir a la vista de seleccionar transporte
   const handleParadaSelect = (paradaId) => {
-    // Redirigir a la vista de SeleccionarTransporte y pasar el ID de la parada seleccionada
     navigate(`/seleccionarTransporte/${paradaId}`);
   };
 
   return (
-    <div className="page-container">
-     
+    <Container className="mt-4">
+      {/* Mensaje de error */}
+      {error && <Alert variant="danger">{error}</Alert>}
 
-      <div className="search-container">
-        <input 
-          type="text" 
-          placeholder="Buscar parada por nombre o ubicación..." 
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-      </div>
+      <Row>
+        <Col md={6} className="mx-auto">
+          <Form>
+            <Form.Group controlId="searchTerm">
+              <InputGroup>
+                <Form.Control
+                  type="text"
+                  placeholder="Buscar parada por nombre o ubicación..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </InputGroup>
+            </Form.Group>
+          </Form>
+        </Col>
+      </Row>
 
-      <div className="search-results">
-        {/* Mostrar la lista completa o los resultados filtrados */}
-        <ul>
-          {filteredParadas.length > 0 ? (
-            filteredParadas.map(parada => (
-              <li 
-                key={parada._id} 
-                onClick={() => handleParadaSelect(parada._id)} // Redirigir a la nueva vista
-                className="search-item"
-              >
-                <div className="parada-nombre">{parada.nombre}</div>
-                <div className="parada-ubicacion">{parada.ubicacion}</div>
-              </li>
-            ))
-          ) : (
-            <li>No se encontraron paradas</li>
-          )}
-        </ul>
-      </div>
-
-  
-    </div>
+      {/* Resultados de la búsqueda */}
+      <Row className="mt-4">
+        <Col md={6} className="mx-auto">
+          <ListGroup>
+            {filteredParadas.length > 0 ? (
+              filteredParadas.map(parada => (
+                <ListGroup.Item 
+                  key={parada._id} 
+                  action 
+                  onClick={() => handleParadaSelect(parada._id)}
+                  className="d-flex justify-content-between align-items-center"
+                >
+                  <div>
+                    <h5 className="mb-1">{parada.nombre}</h5>
+                    <small>Latitud: {parada.ubicacion.latitud}, Longitud: {parada.ubicacion.longitud}</small>
+                  </div>
+                  <button className="btn btn-primary btn-sm">Seleccionar</button>
+                </ListGroup.Item>
+              ))
+            ) : (
+              <ListGroup.Item>No se encontraron paradas</ListGroup.Item>
+            )}
+          </ListGroup>
+        </Col>
+      </Row>
+    </Container>
   );
 }
 

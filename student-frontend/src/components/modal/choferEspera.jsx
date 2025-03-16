@@ -44,7 +44,7 @@ const ChoferEsperaModal = ({ show, setShow }) => {
           <Modal.Title>El chofer no te esperará</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          El chofer ha confirmado que no podrá esperarte. ¡Apúrate para llegar!
+          El chofer ha confirmado que no podrá esperarte. ¡Lo siento!
         </Modal.Body>
         <Modal.Footer>
           <Button variant="primary" onClick={() => setShowNoWaitModal(false)}>

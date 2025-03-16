@@ -28,6 +28,7 @@ function App() {
         <Route path="/filtrarParada" element={<FiltrarParada />} />
         <Route path="/seleccionarTransporte/:paradaId" element={<SeleccionarTransporte />} />
         <Route path="/mapa" element={<MapView />} />
+        <Route path="/mapa/:coban_id" element={<MapView />} />
         <Route path="/horarios" element={<HorariosDisponibles />} />
       </Routes>
     </Router>

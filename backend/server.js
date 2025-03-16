@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
 const fetch = require('node-fetch'); // Importar fetch para hacer peticiones a Flespi
-
+const Transporte = require("./models/transporte.models"); 
 const app = express();
 
 // Importar las rutas
@@ -43,6 +43,15 @@ app.use('/api', paradaRoutes); // Rutas de paradas
 app.use('/api', transporteRoutes); // Rutas de transporte
 app.use('/api/auth', authRoutes); // Rutas de autenticación
 app.use('/api/horarios', horarioRoutes); // Rutas de horarios
+
+app.get('/api/transportes', async (req, res) => {
+  try {
+    const transportes = await Transporte.find({ 'paradas.parada': req.query.paradaId });
+    res.json(transportes);  // Asegúrate de que el `coban_id` esté en cada transporte
+  } catch (error) {
+    res.status(500).json({ message: 'Error al obtener los transportes', error });
+  }
+});
 
 // =============================
 // Integración de WebSocket (Socket.IO)
@@ -129,6 +138,7 @@ const obtenerUbicacionDesdeFlespi = async () => {
 
       const latitud = mensaje["position.latitude"];
       const longitud = mensaje["position.longitude"];
+      const device = String(mensaje["device.id"]);
       const timestamp = mensaje.timestamp || null;
 
       console.log("🔍 Coordenadas recibidas:", latitud, longitud);
@@ -136,7 +146,8 @@ const obtenerUbicacionDesdeFlespi = async () => {
       const ubicacion = {
         latitud,
         longitud,
-        tipo: "gps_transporte", // 🔹 Identificador para el GPS
+        tipo: "gps_transporte",
+        device, // 🔹 Identificador para el GPS
         timestamp
       };
 
