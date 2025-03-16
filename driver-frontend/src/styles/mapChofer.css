@@ -1,0 +1,21 @@
+.floating-button {
+    position: absolute;
+    bottom: 80px; /* Ajusta este valor según la altura del footer */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000; /* Asegúrate de que el botón esté por encima del mapa */
+    padding: 10px 20px;
+    background-color: #A0D4DF;
+    color: #fff;
+    border: 2px solid #7cb7f7;  /* Borde azul */
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);  /* Sombra */
+  }
+  
+  .floating-button:hover {
+    background-color: #A0D4DF;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);  /* Sombra más fuerte al hacer hover */
+  }
+  

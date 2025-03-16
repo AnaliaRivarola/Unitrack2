@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';  // Asegúrate de importar ambos
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { MapView } from "./views/mapChofer";
+import { MensajesRapidos } from "./views/mensajes";
 import "bootstrap/dist/css/bootstrap.min.css";
 import axios from 'axios';
 
@@ -22,7 +23,8 @@ function App() {
       <Routes>
 
         <Route path="/chofer/mapa" element={<MapView />} />
-        
+        <Route path="/chofer/mensajes" element={<MensajesRapidos />} />
+
       </Routes>
     </Router>
   );

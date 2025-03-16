@@ -77,6 +77,12 @@ io.on("connection", (socket) => {
     console.log("🟢 Chofer esperará al estudiante en:", data);
     io.emit("choferEsperara", data); // Enviar evento a los estudiantes
   });
+  
+  //Escuchar cuando el chofer manda un mensaje
+  socket.on("mensaje-conductor", (mensaje) => {
+    console.log("Mensaje recibido del conductor:", mensaje);
+    io.emit("mensaje-estudiante", mensaje); // Enviar a todos los estudiantes
+  });
 
   // Manejo de desconexión
   socket.on("disconnect", () => {

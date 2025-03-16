@@ -7,12 +7,13 @@ import io from "socket.io-client";
 import L from "leaflet";
 import { Modal, Button } from "react-bootstrap";
 import ChoferEsperaModal from "../components/modal/choferEspera";
+import { MensajeModal } from "../components/modal/mensajeChofer"; // 📌 Importa el modal
 import markerIcon from "../assets/icono2.png"; 
 import studentIcon from "../assets/student.png"; 
 import paradaIcon from "../assets/parada.png";
-import Sidebar from "./sideBar"; // Importa el sidebar
-import '../styles/mapa.css';  // Importa el archivo CSS
-import axios from "axios";  // Asegúrate de importar axios para las solicitudes HTTP
+import Sidebar from "./sideBar"; 
+import '../styles/mapa.css';  
+import axios from "axios";  
 
 const socket = io("http://localhost:5000");
 
@@ -23,7 +24,6 @@ const busIcon = L.icon({
   popupAnchor: [0, -40]
 });
 
-// Icono personalizado para la ubicación del estudiante
 const studentLocationIcon = L.icon({
   iconUrl: studentIcon,  
   iconSize: [30, 30],  
@@ -31,9 +31,8 @@ const studentLocationIcon = L.icon({
   popupAnchor: [0, -15] 
 });
 
-// Icono personalizado para las paradas
 const stopIcon = L.icon({
-  iconUrl: paradaIcon, // Reemplázalo con el icono que desees
+  iconUrl: paradaIcon, 
   iconSize: [30, 40],
   iconAnchor: [15, 15],
   popupAnchor: [0, -15]
@@ -55,14 +54,17 @@ export const MapView = () => {
   const [noData, setNoData] = useState(false);
   const [lastUpdate, setLastUpdate] = useState(Date.now());
   const [studentLocation, setStudentLocation] = useState(null);
-  const [stops, setStops] = useState([]); // Estado para almacenar las paradas]
+  const [stops, setStops] = useState([]);
   const [showModal, setShowModal] = useState(false);
 
-  //chofer espera 
+  // 📌 Estado para manejar el mensaje recibido del chofer
+  const [mensajeChofer, setMensajeChofer] = useState("");
+  const [showMensajeModal, setShowMensajeModal] = useState(false);
+
   useEffect(() => {
     socket.on("choferEsperara", () => {
       console.log("Evento 'choferEsperara' recibido");
-      setShowModal(true);  // Mostrar el modal cuando el chofer confirme
+      setShowModal(true);
     });
   
     return () => {
@@ -70,18 +72,17 @@ export const MapView = () => {
     };
   }, []);
 
-  // Obtener las paradas desde el backend
   useEffect(() => {
     const fetchStops = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/paradas"); // Ajusta la URL según tu API
-        setStops(response.data); // Asume que la API devuelve un array de paradas
+        const response = await axios.get("http://localhost:5000/api/paradas");
+        setStops(response.data);
       } catch (error) {
         console.error("Error al obtener las paradas:", error);
       }
     };
 
-    fetchStops(); // Llamada para obtener las paradas al cargar el componente
+    fetchStops();
   }, []);
 
   useEffect(() => {
@@ -113,6 +114,19 @@ export const MapView = () => {
     };
   }, [lastUpdate]);
 
+  // 📌 Escuchar los mensajes del chofer
+  useEffect(() => {
+    socket.on("mensaje-estudiante", (mensaje) => {  // Cambia 'mensajeChofer' a 'mensaje-estudiante'
+      console.log("📨 Mensaje recibido del chofer:", mensaje);
+      setMensajeChofer(mensaje);
+      setShowMensajeModal(true);
+    });
+  
+    return () => {
+      socket.off("mensaje-estudiante");  // Asegúrate de hacer el cleanup correctamente
+    };
+  }, []);
+
   const handleSendLocation = () => {
     if (navigator.geolocation) {
       console.log("Solicitando ubicación...");
@@ -123,11 +137,10 @@ export const MapView = () => {
   
           setStudentLocation({ lat: latitude, lng: longitude }); 
   
-          // Enviar la ubicación al servidor con identificador
           socket.emit("ubicacionEstudiante", {
             latitud: latitude,
             longitud: longitude,
-            tipo: "ubicacion_estudiante" // 🔹 Identificador para la ubicación del estudiante
+            tipo: "ubicacion_estudiante"
           });
   
           console.log("🚀 Ubicación del estudiante enviada al conductor:", { lat: latitude, lng: longitude });
@@ -154,9 +167,9 @@ export const MapView = () => {
           console.error("No se pudo obtener la ubicación", err);
         },
         {
-          enableHighAccuracy: true,  // Habilita la mayor precisión posible
-          timeout: 10000,            // Establece un tiempo de espera
-          maximumAge: 0              // Evita que use una ubicación en caché
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0
         }
       );
     } else {
@@ -168,6 +181,14 @@ export const MapView = () => {
     <div>
       {/*<Navbar logoSrc="../src/assets/logoLetra.png" altText="Logo" />*/}
       <ChoferEsperaModal show={showModal} setShow={setShowModal} />
+      
+      {/* 📌 Modal para mostrar mensajes del chofer */}
+      <MensajeModal 
+        show={showMensajeModal} 
+        handleClose={() => setShowMensajeModal(false)} 
+        mensaje={mensajeChofer} 
+      />
+
       <MapContainer key={`${position.lat}-${position.lng}`} center={position} zoom={15} style={{ height: "calc(100vh - 60px)", width: "100%" }}>
         <Sidebar />
         <ChangeView center={position} />
@@ -180,19 +201,13 @@ export const MapView = () => {
             {noData ? "⚠️ Sin actualización de ubicación" : "🚍 Transporte en tiempo real"}
           </Popup>
         </Marker>
-        
-        {/* Mostrar la ubicación del estudiante en el mapa */}
+
         {studentLocation && (
           <Marker position={studentLocation} icon={studentLocationIcon}>
-            <Popup>
-              {"Tu estas aqui!"}
-              <br />
-              {"Que te vaya bien en tus clases el dia de hoy"}
-            </Popup>
+            <Popup>{"Tu estás aquí!"}</Popup>
           </Marker>
         )}
 
-        {/* Mostrar las paradas en el mapa */}
         {stops.map((stop) => (
           <Marker key={stop._id} position={[stop.ubicacion.latitud, stop.ubicacion.longitud]} icon={stopIcon}>
             <Popup>Nombre: {stop.nombre}</Popup>
@@ -200,7 +215,6 @@ export const MapView = () => {
         ))}
       </MapContainer>
 
-      {/* Botón flotante */}
       <button onClick={handleSendLocation} className="floating-button">
         Enviar mi ubicación
       </button>
