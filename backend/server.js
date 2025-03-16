@@ -84,6 +84,12 @@ io.on("connection", (socket) => {
     io.emit("mensaje-estudiante", mensaje); // Enviar a todos los estudiantes
   });
 
+  // Escuchar cuando el chofer confirma que no esperará al estudiante
+  socket.on("choferNoEsperara", (data) => {
+    console.log("🔴 Chofer no esperará al estudiante en:", data);
+    io.emit("choferNoEsperara", data); // Enviar evento a los estudiantes
+  });
+
   // Manejo de desconexión
   socket.on("disconnect", () => {
     console.log("❌ Cliente desconectado:", socket.id);

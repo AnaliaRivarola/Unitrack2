@@ -127,6 +127,7 @@ export const MapView = () => {
     };
   }, []);
 
+
   const handleSendLocation = () => {
     if (navigator.geolocation) {
       console.log("Solicitando ubicación...");
