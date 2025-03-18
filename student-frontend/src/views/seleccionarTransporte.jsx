@@ -30,9 +30,8 @@ function SeleccionarTransportes() {
     fetchTransportes();
   }, [paradaId]);  // Este efecto depende del `paradaId`, se vuelve a ejecutar cuando cambia
 
-  // Función que maneja la navegación al mapa y la selección de un transporte
-  const handleTrackTransporte = (coban_id) => {
-    navigate(`/mapa/${coban_id}`);  // Redirigimos a la vista del mapa, pasando el `coban_id`
+  const handleViewMap = () => {
+    navigate('/mapa');  // Redirigimos al mapa
   };
 
   return (
@@ -42,7 +41,7 @@ function SeleccionarTransportes() {
       <Row>
         <Col md={8} className="mx-auto">
           <h3>Transportes disponibles para esta parada</h3>
-
+          <p>Esta es una guia para que sepas que transportes pasan por las paradas que seleccionaste</p>
           {loading ? (
             <Spinner animation="border" variant="primary" /> 
           ) : (
@@ -54,12 +53,6 @@ function SeleccionarTransportes() {
                       <h5>{transporte.nombre}</h5>  {/* Nombre del transporte */}
                       <p>Otra info que no se que puede ser</p>  {/* Aquí puedes agregar más detalles si lo deseas */}
                     </div>
-                    <Button 
-                      variant="primary" 
-                      onClick={() => handleTrackTransporte(transporte.coban_id)}  // Enviar el `coban_id` al mapa
-                    >
-                      Seguir Transporte
-                    </Button>
                   </ListGroup.Item>
                 ))
               ) : (
@@ -67,6 +60,15 @@ function SeleccionarTransportes() {
               )}
             </ListGroup>
           )}
+
+          {/* Botón para redirigir al mapa */}
+          <Button 
+            variant="primary" 
+            onClick={handleViewMap} 
+            className="mt-4"
+          >
+            Ver Mapa
+          </Button>
         </Col>
       </Row>
     </Container>

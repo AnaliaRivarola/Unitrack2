@@ -5,14 +5,24 @@ require('dotenv').config();
 const fetch = require('node-fetch'); // Importar fetch para hacer peticiones a Flespi
 const Transporte = require("./models/transporte.models"); 
 const app = express();
-
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+const User = require('./models/usuario.models'); // Ruta a tu modelo de usuario
+const usuariosRoutes = require('./routes/authRoutes');
 // Importar las rutas
-const usuarioRoutes = require('./routes/usuarioRoutes');
 const paradaRoutes = require('./routes/paradaRoutes');
 const transporteRoutes = require('./routes/transporteRoutes');
 const authRoutes = require('./routes/authRoutes');
-const horarioRoutes = require('./routes/horarioRoutes');
 
+const horarioRoutes = require('./routes/horarioRoutes');
+const generarHash = async (password) => {
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(password, salt);
+  console.log("Contraseña encriptada:", hashedPassword);
+};
+
+// Reemplaza '123456' con la contraseña que quieres usar
+generarHash('123456');
 // =============================
 // Middleware
 // =============================
@@ -38,20 +48,72 @@ app.get('/Unitrack', (req, res) => {
   res.json({ message: '¡Conexión exitosa con el backend!' });
 });
 
-app.use('/api', usuarioRoutes); // Rutas de usuarios
+app.get('/api/usuarios', (req, res) => {
+  // Lógica para obtener los usuarios
+  res.json({ success: true, usuarios: [] });
+});
+
+app.use(express.json());
 app.use('/api', paradaRoutes); // Rutas de paradas
 app.use('/api', transporteRoutes); // Rutas de transporte
 app.use('/api/auth', authRoutes); // Rutas de autenticación
 app.use('/api/horarios', horarioRoutes); // Rutas de horarios
+app.use('/api', usuariosRoutes);
 
-app.get('/api/transportes', async (req, res) => {
+
+
+//AUTENTICACION 
+const login = async (req, res) => {
+  const { email, contraseña } = req.body;
+
   try {
-    const transportes = await Transporte.find({ 'paradas.parada': req.query.paradaId });
-    res.json(transportes);  // Asegúrate de que el `coban_id` esté en cada transporte
+    const usuario = await User.findOne({ email });
+    if (!usuario) {
+      return res.status(400).json({ mensaje: "Usuario no encontrado" });
+    }
+
+    const esValida = await usuario.compararContraseña(contraseña);
+    if (!esValida) {
+      return res.status(400).json({ mensaje: "Contraseña incorrecta" });
+    }
+
+    const token = jwt.sign(
+      { id: usuario._id, rol: usuario.rol }, // El rol sí se incluye en el token
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    // 🔹 Ahora enviamos el rol también en la respuesta
+    res.json({ token, rol: usuario.rol });
+
   } catch (error) {
-    res.status(500).json({ message: 'Error al obtener los transportes', error });
+    res.status(500).json({ mensaje: "Error al procesar la solicitud", error: error.message });
   }
-});
+};
+
+
+
+
+const authenticateJWT = (req, res, next) => {
+  const token = req.headers["authorization"]?.split(" ")[1];
+
+  if (!token) return res.status(403).json({ mensaje: "Acceso denegado, token no proporcionado" });
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    if (err) return res.status(403).json({ mensaje: "Token no válido" });
+
+    req.usuario = decoded; // Asegúrate de que `req.user` tenga `id` y `rol`
+    next();
+  });
+};
+
+// Middleware para verificar el rol del usuario (solo admin o chofer)
+const verifyRole = (roles) => (req, res, next) => {
+  if (!roles.includes(req.usuario.rol)) {
+    return res.status(403).json({ mensaje: "Acceso denegado" });
+  }
+  next();
+};
 
 // =============================
 // Integración de WebSocket (Socket.IO)
@@ -138,7 +200,6 @@ const obtenerUbicacionDesdeFlespi = async () => {
 
       const latitud = mensaje["position.latitude"];
       const longitud = mensaje["position.longitude"];
-      const device = String(mensaje["device.id"]);
       const timestamp = mensaje.timestamp || null;
 
       console.log("🔍 Coordenadas recibidas:", latitud, longitud);
@@ -147,7 +208,6 @@ const obtenerUbicacionDesdeFlespi = async () => {
         latitud,
         longitud,
         tipo: "gps_transporte",
-        device, // 🔹 Identificador para el GPS
         timestamp
       };
 

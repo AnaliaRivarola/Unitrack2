@@ -1,12 +1,28 @@
-import { useState, useEffect } from 'react';  // Asegúrate de importar ambos
+import { useState, useEffect } from 'react';  
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { MapView } from "./views/mapChofer";
 import { MensajesRapidos } from "./views/mensajes";
 import "bootstrap/dist/css/bootstrap.min.css";
 import axios from 'axios';
+import Login from './views/Login';  // Asegúrate de tener la ruta correcta
 
 function App() {
   const [count, setCount] = useState(0);
+
+  // Verificar si hay un token en el localStorage
+  const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('token'));
+
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setIsAuthenticated(!!localStorage.getItem('token'));
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
 
   useEffect(() => {
     axios.get('http://localhost:5000/Unitrack')  // Cambia esto si tu ruta de API es diferente
@@ -22,8 +38,15 @@ function App() {
     <Router>
       <Routes>
 
-        <Route path="/chofer/mapa" element={<MapView />} />
-        <Route path="/chofer/mensajes" element={<MensajesRapidos />} />
+        {/* Si no está autenticado, redirigir a /login */}
+        <Route path="/" element={isAuthenticated ? <MapView /> : <Login />} />
+        
+        {/* Ruta de login */}
+        <Route path="/login" element={<Login />} />
+        
+        {/* Rutas protegidas para el chofer */}
+        <Route path="/chofer/mapa" element={isAuthenticated ? <MapView /> : <Login />} />
+        <Route path="/chofer/mensajes" element={isAuthenticated ? <MensajesRapidos /> : <Login />} />
 
       </Routes>
     </Router>

@@ -1,4 +1,3 @@
-// GestionarUsuarios.js
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
@@ -17,7 +16,12 @@ export const GestionarUsuarios = () => {
         
         // Acceder a la propiedad usuarios dentro del objeto de respuesta
         if (response.data.success) {
-          setUsuarios(response.data.usuarios);
+          // No incluir la contraseña en los datos que se guardan en el estado
+          const usuariosSinContraseña = response.data.usuarios.map(usuario => {
+            const { contraseña, ...restoUsuario } = usuario;
+            return restoUsuario;
+          });
+          setUsuarios(usuariosSinContraseña);
         } else {
           console.error('Error al obtener usuarios');
         }
@@ -40,7 +44,7 @@ export const GestionarUsuarios = () => {
 
   return (
     <div className="gestionar-usuarios-container">
-      <Navbar logoSrc="../src/assets/logoLetra.png" altText="Logo" /><Navbar logoSrc="../src/assets/logoLetra.png" altText="Logo" />
+      <Navbar logoSrc="../src/assets/logoLetra.png" altText="Logo" />
       <h1>Gestionar Usuarios</h1>
       
       <div className="create-user-button">

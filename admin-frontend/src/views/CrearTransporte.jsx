@@ -59,7 +59,7 @@ export const CrearTransporte = () => {
 
         <div>
           <label>ID de Coban:</label>
-          <input type="text" value={cobanId} onChange={(e) => setCobanId(e.target.value)} required />
+          <input type="number" value={cobanId} onChange={(e) => setCobanId(e.target.value)} required />
         </div>
 
         <div>

@@ -19,7 +19,6 @@ import { useParams } from "react-router-dom";
 
 const socket = io("http://localhost:5000");
 
-
 const busIcon = L.icon({
   iconUrl: markerIcon,
   iconSize: [27, 55],
@@ -64,19 +63,7 @@ export const MapView = () => {
   const [mensajeChofer, setMensajeChofer] = useState("");
   const [showMensajeModal, setShowMensajeModal] = useState(false);
 
-// 📌 Estado para almacenar el transporte seleccionado
-const [selectedTransporte, setSelectedTransporte] = useState(null);
-
-const { coban_id } = useParams();
-
-useEffect(() => {
-  // Lógica para seleccionar el transporte con el coban_id
-  if (coban_id) {
-    setSelectedTransporte(coban_id);  // Establecer el transporte seleccionado con el coban_id recibido
-    console.log("Transporte seleccionado:", coban_id);
-  }
-}, [coban_id]); 
-
+  // Eliminamos el estado y la lógica de `selectedTransporte`
 
   useEffect(() => {
     socket.on("choferEsperara", () => {
@@ -118,51 +105,39 @@ useEffect(() => {
       }
   
       console.log("🔍 Claves disponibles en data:", Object.keys(data));
+
   
-      if (!data.device) {
-        console.error("⚠️ Error: No se recibió un 'device' válido en los datos.");
-        return;
-      }
-  
-      console.log("🔍 device recibido:", data.device);
-      console.log("🔍 selectedTransporte:", selectedTransporte);
-  
-      // Asegurémonos de que el `selectedTransporte` tiene el valor correcto
-      if (selectedTransporte && String(data.device) === String(selectedTransporte)) {
-        if (typeof data.latitud === "number" && typeof data.longitud === "number") {
-          console.log("✅ Transporte coincide, actualizando ubicación...");
-          setPosition({
-            lat: data.latitud,
-            lng: data.longitud,
-          });
-          setNoData(false);
-          setLastUpdate(Date.now());
-        } else {
-          console.error("⚠️ Datos de ubicación incompletos o inválidos:", data);
-        }
+      if (typeof data.latitud === "number" && typeof data.longitud === "number") {
+        console.log("✅ Actualizando ubicación del transporte...");
+        setPosition({
+          lat: data.latitud,
+          lng: data.longitud,
+        });
+        setNoData(false);
+        setLastUpdate(Date.now());
       } else {
-        console.warn(`⚠️ El 'device' recibido (${data.device}) no coincide con el transporte seleccionado (${selectedTransporte}).`);
+        console.error("⚠️ Datos de ubicación incompletos o inválidos:", data);
       }
     });
   
     return () => {
       socket.off("ubicacionActualizada");
     };
-  }, [lastUpdate, selectedTransporte]); // Dependencia de selectedTransporte
+  }, [lastUpdate]);
 
   useEffect(() => {
-    console.log("🚍 selectedTransporte actualizado:", selectedTransporte);
-  }, [selectedTransporte]);
+    console.log("🚍 Mapa actualizado");
+  }, [position]);
 
   useEffect(() => {
-    socket.on("mensaje-estudiante", (mensaje) => {  // Cambia 'mensajeChofer' a 'mensaje-estudiante'
+    socket.on("mensaje-estudiante", (mensaje) => {
       console.log("📨 Mensaje recibido del chofer:", mensaje);
       setMensajeChofer(mensaje);
       setShowMensajeModal(true);
     });
   
     return () => {
-      socket.off("mensaje-estudiante");  // Asegúrate de hacer el cleanup correctamente
+      socket.off("mensaje-estudiante");
     };
   }, []);
 
@@ -175,9 +150,7 @@ useEffect(() => {
           console.log("🎒 Ubicación del estudiante obtenida:", { lat: latitude, lng: longitude });
   
           setStudentLocation({ lat: latitude, lng: longitude }); 
-  
-          socket.emit("ubicacionEstudiante", {
-            device_id: selectedTransporte, 
+          socket.emit("ubicacionEstudiante", {  
             latitud: latitude,
             longitud: longitude,
             tipo: "ubicacion_estudiante"
@@ -217,10 +190,8 @@ useEffect(() => {
     }
   }, []);
 
-
   return (
     <div>
-      {/*<Navbar logoSrc="../src/assets/logoLetra.png" altText="Logo" />*/}
       <ChoferEsperaModal show={showModal} setShow={setShowModal} />
       
       {/* 📌 Modal para mostrar mensajes del chofer */}
