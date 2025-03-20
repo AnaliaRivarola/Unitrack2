@@ -4,7 +4,12 @@ const router = express.Router();
 const User = require('../models/usuario.models.js'); // Asegúrate de que el nombre del modelo sea correcto
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken'); // Asegúrate de importar jwt
-const { obtenerUsuarios, obtenerUsuarioPorId } = require('../controllers/authController.js'); // Importamos las funciones del controlador
+const { authenticateJWT, verifyRole } = require('../middlewares/authMiddleware');
+const { obtenerUsuarios, obtenerUsuarioPorId, crearUsuario, editarUsuario, eliminarUsuario } = require('../controllers/authController');
+
+
+// Ruta para crear un nuevo usuario (solo admin o superadmin)
+router.post('/usuarios', authenticateJWT, verifyRole(['admin', 'superadmin']), crearUsuario);
 // Ruta de login
 router.post('/login', async (req, res) => {
     console.log('Ruta de login llamada');
@@ -44,9 +49,29 @@ router.post('/login', async (req, res) => {
     }
 });
 
+router.get('/me', authenticateJWT, (req, res) => {
+    try {
+      const usuario = req.usuario; // Usuario autenticado (extraído del token JWT)
+      if (!usuario) {
+        return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
+      }
+      return res.json({ success: true, usuario });
+    } catch (error) {
+      console.error('Error al obtener el usuario autenticado:', error);
+      return res.status(500).json({ success: false, message: 'Error al obtener el usuario autenticado' });
+    }
+  });
+
 // Ruta para obtener todos los usuarios
-router.get('/usuarios', obtenerUsuarios);
+router.get('/usuarios', authenticateJWT, obtenerUsuarios);
 
 // Ruta para obtener un usuario específico por su ID
 router.get('/usuarios/:id', obtenerUsuarioPorId);
+
+// Ruta para editar un usuario (requiere autenticación y permisos)
+router.put('/usuarios/:id', authenticateJWT, verifyRole(['admin', 'superadmin']), editarUsuario);
+
+// Ruta para eliminar un usuario (requiere autenticación y permisos)
+router.delete('/usuarios/:id', authenticateJWT, verifyRole(['admin', 'superadmin']), eliminarUsuario);
+
 module.exports = router;

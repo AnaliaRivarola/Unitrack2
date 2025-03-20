@@ -76,14 +76,18 @@ export const EditParada = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.put(`http://localhost:5000/api/paradas/${id}`, formData);
-      setMessage('Parada actualizada exitosamente.');
-      setTimeout(() => {
-        navigate('/admin/gestionar-paradas'); // Redirigir a la lista de paradas después de la actualización
-      }, 1500);
+      const token = localStorage.getItem('token'); // Obtén el token del almacenamiento local
+      const response = await axios.put(`http://localhost:5000/api/paradas/${id}`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`, // Incluye el token en el encabezado
+        },
+      });
+      console.log('Parada actualizada:', response.data);
+      alert('Parada actualizada correctamente');
+      navigate('/admin/gestionar-paradas'); // Redirige después de actualizar
     } catch (error) {
-      console.error('Error al actualizar la parada:', error);
-      setMessage('Hubo un error al actualizar la parada.');
+      console.error('Error al actualizar la parada:', error.response?.data || error.message);
+      alert(error.response?.data?.mensaje || 'Hubo un error al actualizar la parada.');
     }
   };
 

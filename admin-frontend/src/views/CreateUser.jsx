@@ -1,32 +1,42 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import '../styles/CreateUser.css'; // Asegúrate de tener un archivo CSS para los estilos
+import { useNavigate } from 'react-router-dom'; // Importa useNavigate
+import '../styles/CreateUser.css';
 
 export const CreateUser = () => {
-  const [id_usuario, setIdUsuario] = useState('');
   const [nombre, setNombre] = useState('');
-  const [tipo_usuario, setTipoUsuario] = useState('');
   const [email, setEmail] = useState('');
-  const [telefono, setTelefono] = useState('');
-  const [password, setPassword] = useState('');
+  const [contraseña, setContraseña] = useState('');
+  const [rol, setRol] = useState('');
+  const [estado, setEstado] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const navigate = useNavigate(); // Declara useNavigate
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/register', {
-        id_usuario,
-        nombre,
-        tipo_usuario,
-        email,
-        telefono,
-        password,
-      });
+      const token = localStorage.getItem('token'); // Obtén el token del almacenamiento local
+      const response = await axios.post(
+        'http://localhost:5000/api/auth/usuarios',
+        {
+          nombre,
+          email,
+          contraseña,
+          rol,
+          estado,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Incluye el token en el encabezado
+          },
+        }
+      );
 
       if (response.data.success) {
         setSuccess(response.data.message);
         setError('');
+        navigate('/admin/gestionar-usuarios'); // Redirige al dashboard del administrador
       } else {
         setError(response.data.message);
         setSuccess('');
@@ -42,18 +52,6 @@ export const CreateUser = () => {
       <h1>Crear Usuario</h1>
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-          <label htmlFor="id_usuario">ID de Usuario</label>
-          <input
-            type="text"
-            id="id_usuario"
-            placeholder="Ingrese el ID de usuario"
-            value={id_usuario}
-            onChange={(e) => setIdUsuario(e.target.value)}
-            required
-          />
-        </div>
-
-        <div className="form-group">
           <label htmlFor="nombre">Nombre</label>
           <input
             type="text"
@@ -63,21 +61,6 @@ export const CreateUser = () => {
             onChange={(e) => setNombre(e.target.value)}
             required
           />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="tipo_usuario">Tipo de Usuario</label>
-          <select
-            id="tipo_usuario"
-            value={tipo_usuario}
-            onChange={(e) => setTipoUsuario(e.target.value)}
-            required
-          >
-            <option value="">Seleccionar tipo</option>
-            <option value="admin">Administrador</option>
-            <option value="chofer">Chofer</option>
-            <option value="usuario">Usuario común</option>
-          </select>
         </div>
 
         <div className="form-group">
@@ -93,27 +76,39 @@ export const CreateUser = () => {
         </div>
 
         <div className="form-group">
-          <label htmlFor="telefono">Teléfono</label>
+          <label htmlFor="contraseña">Contraseña</label>
           <input
-            type="tel"
-            id="telefono"
-            placeholder="Ingrese el teléfono"
-            value={telefono}
-            onChange={(e) => setTelefono(e.target.value)}
+            type="password"
+            id="contraseña"
+            placeholder="Ingrese la contraseña"
+            value={contraseña}
+            onChange={(e) => setContraseña(e.target.value)}
             required
           />
         </div>
 
         <div className="form-group">
-          <label htmlFor="password">Contraseña</label>
-          <input
-            type="password"
-            id="password"
-            placeholder="Ingrese la contraseña"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+          <label htmlFor="rol">Rol</label>
+          <select
+            id="rol"
+            value={rol}
+            onChange={(e) => setRol(e.target.value)}
             required
+          >
+            <option value="">Seleccionar rol</option>
+            <option value="chofer">Chofer</option>
+          </select>
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="estado">Estado</label>
+          <input
+            type="checkbox"
+            id="estado"
+            checked={estado}
+            onChange={(e) => setEstado(e.target.checked)}
           />
+          <span>{estado ? 'Activo' : 'Inactivo'}</span>
         </div>
 
         {error && <div className="error-message">{error}</div>}

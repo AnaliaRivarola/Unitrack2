@@ -1,89 +1,111 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { Navbar } from 'shared-frontend/components/Navbar';  // Asegúrate de que el Navbar esté importado
+import { Navbar } from 'shared-frontend/components/Navbar';
 import { Footer } from 'shared-frontend/components/Footer';
-import '../styles/GestionarUsuarios.css'; // Asegúrate de tener un archivo CSS para los estilos
+import '../styles/GestionarUsuarios.css';
 
 export const GestionarUsuarios = () => {
   const [usuarios, setUsuarios] = useState([]);
+  const [usuarioAutenticado, setUsuarioAutenticado] = useState(null);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    // Obtener la lista de usuarios al cargar la vista
     const fetchUsuarios = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/usuarios');
-        
-        // Acceder a la propiedad usuarios dentro del objeto de respuesta
+        const token = localStorage.getItem('token'); // Obtén el token del almacenamiento local
+        const response = await axios.get('http://localhost:5000/api/auth/usuarios', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
         if (response.data.success) {
-          // No incluir la contraseña en los datos que se guardan en el estado
-          const usuariosSinContraseña = response.data.usuarios.map(usuario => {
-            const { contraseña, ...restoUsuario } = usuario;
-            return restoUsuario;
-          });
-          setUsuarios(usuariosSinContraseña);
-        } else {
-          console.error('Error al obtener usuarios');
+          setUsuarios(response.data.usuarios);
         }
       } catch (error) {
         console.error('Error al obtener usuarios:', error);
+        setError('No se pudieron cargar los usuarios. Intenta nuevamente.');
+      }
+    };
+
+    const fetchUsuarioAutenticado = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await axios.get('http://localhost:5000/api/auth/me', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        setUsuarioAutenticado(response.data.usuario);
+      } catch (error) {
+        console.error('Error al obtener el usuario autenticado:', error);
       }
     };
 
     fetchUsuarios();
+    fetchUsuarioAutenticado();
   }, []);
 
   const handleDelete = async (id) => {
+    const confirmDelete = window.confirm('¿Estás seguro de que deseas eliminar este usuario?');
+    if (!confirmDelete) return; // Si el usuario cancela, no se ejecuta la eliminación
+
     try {
-      await axios.delete(`http://localhost:5000/api/usuarios/${id}`);
-      setUsuarios(usuarios.filter((usuario) => usuario.id_usuario !== id));
+      const token = localStorage.getItem('token');
+      await axios.delete(`http://localhost:5000/api/auth/usuarios/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setUsuarios(usuarios.filter((usuario) => usuario._id !== id)); // Actualiza la lista de usuarios
     } catch (error) {
       console.error('Error al eliminar usuario:', error);
     }
   };
 
   return (
-    <div className="gestionar-usuarios-container">
+    <>
       <Navbar logoSrc="../src/assets/logoLetra.png" altText="Logo" />
-      <h1>Gestionar Usuarios</h1>
-      
-      <div className="create-user-button">
-        <Link to="/admin/create-user">
-          <button>Crear Usuario</button>
-        </Link>
-      </div>
+      <div className="gestionar-usuarios-container">
+        <h1>Gestionar Usuarios</h1>
 
-      <table className="usuarios-table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Nombre</th>
-            <th>Email</th>
-            <th>Teléfono</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {usuarios.map((usuario) => (
-            <tr key={usuario.id_usuario}>
-              <td>{usuario.id_usuario}</td>
-              <td>{usuario.nombre}</td>
-              <td>{usuario.email}</td>
-              <td>{usuario.telefono}</td>
-              <td id='acciones'>
-                <Link to={`/admin/usuarios/${usuario.id_usuario}/ver`}>
-                  <button>Ver</button>
-                </Link>
-                <Link to={`/admin/usuarios/${usuario.id_usuario}/editar`}>
-                  <button>Editar</button>
-                </Link>
-                <button onClick={() => handleDelete(usuario.id_usuario)}>Eliminar</button>
-              </td>
+        {error && <div className="error-message">{error}</div>}
+
+        <div className="create-user-button">
+          <Link to="/admin/create-user">
+            <button>Crear Usuario</button>
+          </Link>
+        </div>
+
+        <table className="usuarios-table">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Email</th>
+              <th>Acciones</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-      <Footer /> {/* Coloca el Footer en la parte inferior */}
-    </div>
+          </thead>
+          <tbody>
+            {usuarios
+              .filter((usuario) => usuario._id !== usuarioAutenticado?._id) // Filtrar al usuario autenticado (admin)
+              .map((usuario) => (
+                <tr key={usuario._id}>
+                  <td>{usuario.nombre}</td>
+                  <td>{usuario.email}</td>
+                  <td id="acciones">
+                    <Link to={`/admin/usuarios/${usuario._id}/editar`}>
+                      <button>Editar</button>
+                    </Link>
+                    <button onClick={() => handleDelete(usuario._id)}>Eliminar</button>
+                  </td>
+                </tr>
+              ))}
+          </tbody>
+        </table>
+        <Footer />
+      </div>
+    </>
   );
 };

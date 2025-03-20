@@ -34,8 +34,11 @@ export const CrearHorario = () => {
   // Enviar formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log('Datos enviados:', formData); // Log para verificar los datos enviados
+
     try {
-      await axios.post('http://localhost:5000/api/horarios', formData);
+      const response = await axios.post('http://localhost:5000/api/horarios', formData);
+      console.log('Respuesta del servidor:', response.data); // Log para verificar la respuesta del backend
       alert('Horario creado exitosamente');
       setFormData({
         id_transporte: '',
@@ -44,7 +47,7 @@ export const CrearHorario = () => {
         origen: '',
       });
     } catch (error) {
-      console.error('Error al crear horario:', error);
+      console.error('Error al crear horario:', error.response?.data || error.message);
       alert('Hubo un problema al crear el horario');
     }
   };

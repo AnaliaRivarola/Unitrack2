@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Horario = require('../models/horario.models');
+const Auditoria = require('../models/auditoria.models'); // Importa el modelo de auditoría
 
 // Crear un nuevo horario
 const crearHorario = async (req, res) => {
@@ -17,9 +18,23 @@ const crearHorario = async (req, res) => {
       hora_regreso,
       origen
     });
-    
 
     await nuevoHorario.save();
+
+    // Registrar la acción en la tabla de auditoría
+    try {
+      await Auditoria.create({
+        usuario: req.usuario._id, // Usuario autenticado que realiza la acción
+        accion: 'crear',
+        entidad: 'horario',
+        entidadId: nuevoHorario._id,
+        datosNuevos: nuevoHorario,
+      });
+      console.log('Auditoría registrada correctamente para crear horario');
+    } catch (error) {
+      console.error('Error al registrar auditoría (crear horario):', error);
+    }
+
     res.status(201).json({ message: 'Horario creado exitosamente', horario: nuevoHorario });
   } catch (error) {
     console.error('Error al crear horario:', error);
@@ -43,6 +58,7 @@ exports.getHorarios = async (req, res) => {
   }
 };
 
+// Editar un horario
 const editarHorario = async (req, res) => {
   const { id } = req.params; // Obtenemos el ID del horario a editar
   const { hora_salida, hora_regreso, origen, id_transporte } = req.body; // Obtenemos los datos nuevos
@@ -54,6 +70,8 @@ const editarHorario = async (req, res) => {
       return res.status(404).json({ message: 'Horario no encontrado' });
     }
 
+    const datosAnteriores = { ...horarioExistente._doc }; // Copia los datos actuales antes de modificarlos
+
     // Actualizamos los campos con los nuevos valores, si están presentes
     horarioExistente.hora_salida = hora_salida || horarioExistente.hora_salida;
     horarioExistente.hora_regreso = hora_regreso || horarioExistente.hora_regreso;
@@ -61,15 +79,31 @@ const editarHorario = async (req, res) => {
     horarioExistente.id_transporte = id_transporte || horarioExistente.id_transporte; // Actualizamos el transporte
 
     // Guardamos el horario actualizado
-    await horarioExistente.save();
+    const horarioActualizado = await horarioExistente.save();
 
-    res.json({ message: 'Horario actualizado exitosamente', horario: horarioExistente });
+    // Registrar la acción en la tabla de auditoría
+    try {
+      await Auditoria.create({
+        usuario: req.usuario._id, // Usuario autenticado que realiza la acción
+        accion: 'editar',
+        entidad: 'horario',
+        entidadId: id,
+        datosAnteriores,
+        datosNuevos: horarioActualizado,
+      });
+      console.log('Auditoría registrada correctamente para editar horario');
+    } catch (error) {
+      console.error('Error al registrar auditoría (editar horario):', error);
+    }
+
+    res.json({ message: 'Horario actualizado exitosamente', horario: horarioActualizado });
   } catch (error) {
     console.error('Error al editar el horario:', error);
     res.status(500).json({ message: 'Error al actualizar el horario', error: error.message });
   }
 };
 
+// Eliminar un horario
 const eliminarHorario = async (req, res) => {
   const { id } = req.params;
   try {
@@ -79,13 +113,34 @@ const eliminarHorario = async (req, res) => {
       return res.status(404).json({ message: 'Horario no encontrado' });
     }
 
+    // Registrar la acción en la tabla de auditoría
+    try {
+      await Auditoria.create({
+        usuario: req.usuario._id, // Usuario autenticado que realiza la acción
+        accion: 'eliminar',
+        entidad: 'horario',
+        entidadId: id,
+        datosAnteriores: horarioEliminado,
+      });
+      console.log('Auditoría registrada correctamente para eliminar horario');
+    } catch (error) {
+      console.error('Error al registrar auditoría (eliminar horario):', error);
+    }
+
+    console.log('Datos para auditoría:', {
+      usuario: req.usuario._id,
+      accion: 'eliminar',
+      entidad: 'horario',
+      entidadId: id,
+      datosAnteriores: horarioEliminado,
+    });
+
     res.json({ message: 'Horario eliminado exitosamente' });
   } catch (error) {
     console.error('Error al eliminar el horario:', error);
     res.status(500).json({ message: 'Error al eliminar el horario', error: error.message });
   }
 };
-
 
 // Exportar las funciones
 module.exports = { 

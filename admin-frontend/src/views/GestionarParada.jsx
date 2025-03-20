@@ -13,10 +13,15 @@ export const GestionarParadas = () => {
   // Función para obtener la lista de paradas desde el backend
   const fetchParadas = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/paradas');
+      const token = localStorage.getItem('token'); // Obtén el token del almacenamiento local
+      const response = await axios.get('http://localhost:5000/api/paradas', {
+        headers: {
+          Authorization: `Bearer ${token}`, // Incluye el token en el encabezado
+        },
+      });
       setParadas(response.data);
     } catch (error) {
-      console.error('Error al obtener las paradas:', error);
+      console.error('Error al obtener las paradas:', error.response?.data || error.message);
     }
   };
 
@@ -25,12 +30,18 @@ export const GestionarParadas = () => {
     const confirmacion = window.confirm('¿Estás seguro de que deseas eliminar esta parada?');
     if (confirmacion) {
       try {
-        await axios.delete(`http://localhost:5000/api/paradas/${id}`);
+        const token = localStorage.getItem('token'); // Obtén el token del almacenamiento local
+        const response = await axios.delete(`http://localhost:5000/api/paradas/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`, // Incluye el token en el encabezado
+          },
+        });
         alert('Parada eliminada correctamente');
-        fetchParadas(); // Actualiza la lista después de eliminar
+        // Actualiza la lista de paradas después de eliminar
+        setParadas((prevParadas) => prevParadas.filter((parada) => parada._id !== id));
       } catch (error) {
-        console.error('Error al eliminar la parada:', error);
-        alert('Hubo un error al intentar eliminar la parada.');
+        console.error('Error al eliminar la parada:', error.response?.data || error.message);
+        alert(error.response?.data?.mensaje || 'Hubo un error al eliminar la parada.');
       }
     }
   };

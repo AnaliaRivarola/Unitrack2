@@ -1,6 +1,7 @@
 // controllers/TransporteController.js
 const Transporte = require('../models/transporte.models');
 const Parada = require('../models/parada.models');
+const Auditoria = require('../models/auditoria.models');
 
 // Crear un nuevo transporte
 exports.createTransporte = async (req, res) => {
@@ -21,6 +22,16 @@ exports.createTransporte = async (req, res) => {
     });
 
     await nuevoTransporte.save();
+
+    // Registrar la acción en la tabla de auditoría
+    await Auditoria.create({
+      usuario: req.usuario._id, // Usuario autenticado que realiza la acción
+      accion: 'crear',
+      entidad: 'transporte',
+      entidadId: nuevoTransporte._id,
+      datosNuevos: nuevoTransporte,
+    });
+
     res.status(201).json({ message: 'Transporte creado exitosamente', transporte: nuevoTransporte });
   } catch (error) {
     console.error(error);
@@ -40,10 +51,9 @@ exports.getAllTransportes = async (req, res) => {
 };
 
 // Obtener un transporte por su ID con paradas pobladas
-
 exports.getTransporteById = async (req, res) => {
   const { id } = req.params;
-  
+
   // Verificar si el ID tiene un formato válido
   if (!id.match(/^[0-9a-fA-F]{24}$/)) {
     return res.status(400).json({ message: 'ID de transporte inválido' });
@@ -63,7 +73,6 @@ exports.getTransporteById = async (req, res) => {
   }
 };
 
-
 // Editar un transporte
 exports.updateTransporte = async (req, res) => {
   try {
@@ -75,17 +84,30 @@ exports.updateTransporte = async (req, res) => {
       return res.status(400).json({ message: 'Algunas paradas no son válidas' });
     }
 
-    const transporte = await Transporte.findByIdAndUpdate(
-      req.params.id,
-      { nombre, coban_id, paradas },
-      { new: true }  // Devuelve el transporte actualizado
-    );
-
+    const transporte = await Transporte.findById(req.params.id);
     if (!transporte) {
       return res.status(404).json({ message: 'Transporte no encontrado' });
     }
 
-    res.status(200).json({ message: 'Transporte actualizado exitosamente', transporte });
+    const datosAnteriores = { ...transporte._doc }; // Copia los datos actuales antes de modificarlos
+
+    // Actualizar el transporte
+    transporte.nombre = nombre || transporte.nombre;
+    transporte.coban_id = coban_id || transporte.coban_id;
+    transporte.paradas = paradas || transporte.paradas;
+    const transporteActualizado = await transporte.save();
+
+    // Registrar la acción en la tabla de auditoría
+    await Auditoria.create({
+      usuario: req.usuario._id, // Usuario autenticado que realiza la acción
+      accion: 'editar',
+      entidad: 'transporte',
+      entidadId: transporte._id,
+      datosAnteriores,
+      datosNuevos: transporteActualizado,
+    });
+
+    res.status(200).json({ message: 'Transporte actualizado exitosamente', transporte: transporteActualizado });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Error al actualizar el transporte' });
@@ -95,11 +117,23 @@ exports.updateTransporte = async (req, res) => {
 // Eliminar un transporte
 exports.deleteTransporte = async (req, res) => {
   try {
-    const transporte = await Transporte.findByIdAndDelete(req.params.id);
+    const transporte = await Transporte.findById(req.params.id);
 
     if (!transporte) {
       return res.status(404).json({ message: 'Transporte no encontrado' });
     }
+
+    // Eliminar el transporte
+    await transporte.deleteOne();
+
+    // Registrar la acción en la tabla de auditoría
+    await Auditoria.create({
+      usuario: req.usuario._id, // Usuario autenticado que realiza la acción
+      accion: 'eliminar',
+      entidad: 'transporte',
+      entidadId: transporte._id,
+      datosAnteriores: transporte, // Guarda los datos del transporte eliminado
+    });
 
     res.status(200).json({ message: 'Transporte eliminado exitosamente' });
   } catch (error) {

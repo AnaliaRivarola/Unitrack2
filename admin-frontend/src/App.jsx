@@ -13,7 +13,7 @@ import { CrearTransporte } from "./views/CrearTransporte";
 import { EditarHorario } from './views/EditHorario'; 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Login from './views/Login'; // Asegúrate de tener la ruta correcta
-
+import { EditUser } from './views/EditUser'; // Asegúrate de importar el componente EditUser
 
 import './App.css';
 import axios from 'axios';
@@ -58,6 +58,7 @@ function App() {
         <Route path="/admin/gestionar-transporte" element={isAuthenticated ? <TransporteList /> : <Navigate to="/login" />} />
         <Route path="/admin/crear-transporte" element={isAuthenticated ? <CrearTransporte /> : <Navigate to="/login" />} />
         <Route path="/admin/editar-horario/:id" element={isAuthenticated ? <EditarHorario /> : <Navigate to="/login" />} />
+        <Route path="/admin/usuarios/:id/editar" element={<EditUser />} />
       </Routes>
     </Router>
   );

@@ -57,9 +57,6 @@ export const TransporteList = () => {
                 <td>{transporte.nombre}</td>
                 <td>{transporte.coban_id}</td>
                 <td>
-                  <Link to={`/transporte/${transporte._id}`}>
-                    <button className="btn btn-info">Ver</button>
-                  </Link>
                   {' '}
                   <Link to={`/transporte/editar/${transporte._id}`}>
                     <button className="btn btn-warning">Editar</button>

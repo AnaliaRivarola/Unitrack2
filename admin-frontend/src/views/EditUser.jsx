@@ -1,58 +1,82 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import '../styles/CreateUser.css'; // Asegúrate de tener un archivo CSS para los estilos
+import { useParams, useNavigate } from 'react-router-dom'; // Para obtener el ID del usuario y redirigir
+import '../styles/CreateUser.css'; // Reutilizamos los estilos de creación de usuario
 
-export const CreateUser = () => {
-  const [id_usuario, setIdUsuario] = useState('');
+export const EditUser = () => {
+  const { id } = useParams(); // Obtiene el ID del usuario desde la URL
+  const navigate = useNavigate(); // Para redirigir después de editar
   const [nombre, setNombre] = useState('');
-  const [tipo_usuario, setTipoUsuario] = useState('');
   const [email, setEmail] = useState('');
-  const [telefono, setTelefono] = useState('');
-  const [password, setPassword] = useState('');
+  const [contraseña, setContraseña] = useState('');
+  const [rol, setRol] = useState('');
+  const [estado, setEstado] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
+  // Cargar los datos del usuario al montar el componente
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const token = localStorage.getItem('token'); // Obtén el token del almacenamiento local
+        const response = await axios.get(`http://localhost:5000/api/auth/usuarios/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`, // Incluye el token en el encabezado
+          },
+        });
+
+        const { usuario } = response.data;
+        setNombre(usuario.nombre);
+        setEmail(usuario.email);
+        setRol(usuario.rol);
+        setEstado(usuario.estado);
+      } catch (err) {
+        setError('Error al cargar los datos del usuario.');
+      }
+    };
+
+    fetchUser();
+  }, [id]);
+
+  // Manejar la edición del usuario
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/register', {
-        id_usuario,
-        nombre,
-        tipo_usuario,
-        email,
-        telefono,
-        password,
-      });
+      const token = localStorage.getItem('token'); // Obtén el token del almacenamiento local
+      const response = await axios.put(
+        `http://localhost:5000/api/auth/usuarios/${id}`,
+        {
+          nombre,
+          email,
+          contraseña: contraseña || undefined, // Solo enviar contraseña si se ha cambiado
+          rol,
+          estado,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Incluye el token en el encabezado
+          },
+        }
+      );
 
       if (response.data.success) {
         setSuccess(response.data.message);
         setError('');
+        navigate('/admin/gestionar-usuarios'); // Redirige al listado de usuarios
       } else {
         setError(response.data.message);
         setSuccess('');
       }
     } catch (err) {
-      setError('Error al crear el usuario.');
+      setError('Error al editar el usuario.');
       setSuccess('');
     }
   };
 
   return (
     <div className="create-user-container">
-      <h1>Crear Usuario</h1>
+      <h1>Editar Usuario</h1>
       <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="id_usuario">ID de Usuario</label>
-          <input
-            type="text"
-            id="id_usuario"
-            placeholder="Ingrese el ID de usuario"
-            value={id_usuario}
-            onChange={(e) => setIdUsuario(e.target.value)}
-            required
-          />
-        </div>
-
         <div className="form-group">
           <label htmlFor="nombre">Nombre</label>
           <input
@@ -63,21 +87,6 @@ export const CreateUser = () => {
             onChange={(e) => setNombre(e.target.value)}
             required
           />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="tipo_usuario">Tipo de Usuario</label>
-          <select
-            id="tipo_usuario"
-            value={tipo_usuario}
-            onChange={(e) => setTipoUsuario(e.target.value)}
-            required
-          >
-            <option value="">Seleccionar tipo</option>
-            <option value="admin">Administrador</option>
-            <option value="chofer">Chofer</option>
-            <option value="usuario">Usuario común</option>
-          </select>
         </div>
 
         <div className="form-group">
@@ -93,33 +102,46 @@ export const CreateUser = () => {
         </div>
 
         <div className="form-group">
-          <label htmlFor="telefono">Teléfono</label>
+          <label htmlFor="contraseña">Contraseña</label>
           <input
-            type="tel"
-            id="telefono"
-            placeholder="Ingrese el teléfono"
-            value={telefono}
-            onChange={(e) => setTelefono(e.target.value)}
-            required
+            type="password"
+            id="contraseña"
+            placeholder="Ingrese una nueva contraseña (opcional)"
+            value={contraseña}
+            onChange={(e) => setContraseña(e.target.value)}
           />
         </div>
 
         <div className="form-group">
-          <label htmlFor="password">Contraseña</label>
-          <input
-            type="password"
-            id="password"
-            placeholder="Ingrese la contraseña"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+          <label htmlFor="rol">Rol</label>
+          <select
+            id="rol"
+            value={rol}
+            onChange={(e) => setRol(e.target.value)}
             required
+          >
+            <option value="">Seleccionar rol</option>
+            <option value="superadmin">Superadmin</option>
+            <option value="admin">Administrador</option>
+            <option value="chofer">Chofer</option>
+          </select>
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="estado">Estado</label>
+          <input
+            type="checkbox"
+            id="estado"
+            checked={estado}
+            onChange={(e) => setEstado(e.target.checked)}
           />
+          <span>{estado ? 'Activo' : 'Inactivo'}</span>
         </div>
 
         {error && <div className="error-message">{error}</div>}
         {success && <div className="success-message">{success}</div>}
 
-        <button type="submit">Crear Usuario</button>
+        <button type="submit">Guardar Cambios</button>
       </form>
     </div>
   );

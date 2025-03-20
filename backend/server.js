@@ -13,7 +13,8 @@ const usuariosRoutes = require('./routes/authRoutes');
 const paradaRoutes = require('./routes/paradaRoutes');
 const transporteRoutes = require('./routes/transporteRoutes');
 const authRoutes = require('./routes/authRoutes');
-
+const { obtenerUsuarios } = require('./controllers/authController');
+const { authenticateJWT } = require('./middlewares/authMiddleware');
 const horarioRoutes = require('./routes/horarioRoutes');
 const generarHash = async (password) => {
   const salt = await bcrypt.genSalt(10);
@@ -48,18 +49,19 @@ app.get('/Unitrack', (req, res) => {
   res.json({ message: '¡Conexión exitosa con el backend!' });
 });
 
-app.get('/api/usuarios', (req, res) => {
-  // Lógica para obtener los usuarios
-  res.json({ success: true, usuarios: [] });
-});
 
-app.use(express.json());
+app.get('/api/usuarios', obtenerUsuarios);
+
 app.use('/api', paradaRoutes); // Rutas de paradas
 app.use('/api', transporteRoutes); // Rutas de transporte
 app.use('/api/auth', authRoutes); // Rutas de autenticación
 app.use('/api/horarios', horarioRoutes); // Rutas de horarios
 app.use('/api', usuariosRoutes);
 
+
+app.use('/api/protected-route', authenticateJWT, (req, res) => {
+  res.json({ message: 'Ruta protegida' });
+});
 
 
 //AUTENTICACION 
@@ -94,26 +96,6 @@ const login = async (req, res) => {
 
 
 
-const authenticateJWT = (req, res, next) => {
-  const token = req.headers["authorization"]?.split(" ")[1];
-
-  if (!token) return res.status(403).json({ mensaje: "Acceso denegado, token no proporcionado" });
-
-  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-    if (err) return res.status(403).json({ mensaje: "Token no válido" });
-
-    req.usuario = decoded; // Asegúrate de que `req.user` tenga `id` y `rol`
-    next();
-  });
-};
-
-// Middleware para verificar el rol del usuario (solo admin o chofer)
-const verifyRole = (roles) => (req, res, next) => {
-  if (!roles.includes(req.usuario.rol)) {
-    return res.status(403).json({ mensaje: "Acceso denegado" });
-  }
-  next();
-};
 
 // =============================
 // Integración de WebSocket (Socket.IO)

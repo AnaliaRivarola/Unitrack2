@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
+
 const Login = () => {
   const [email, setEmail] = useState('');
   const [contraseña, setContraseña] = useState('');
@@ -28,8 +29,8 @@ const Login = () => {
       localStorage.setItem('rol', rol);
   
       // Definir las URLs de cada aplicación
-      const adminURL = 'http://localhost:5174';
-      const driverURL = 'http://localhost:5173';
+      const adminURL = 'http://localhost:5173';
+      const driverURL = 'http://localhost:5174';
 
       // Redirigir a la app correspondiente
       if (rol === 'admin') {
