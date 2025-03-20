@@ -2,9 +2,18 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
+const { Server } = require('socket.io'); // Importa Socket.IO
+const http = require('http'); // Necesario para crear el servidor HTTP
+const { iniciarConsultaPeriodica } = require('./utils/flespiUtils'); // Importa la función
 const fetch = require('node-fetch'); // Importar fetch para hacer peticiones a Flespi
 const Transporte = require("./models/transporte.models"); 
 const app = express();
+const server = http.createServer(app); // Crea el servidor HTTP
+const io = new Server(server, {
+  cors: {
+    origin: "*", // Permitir todas las conexiones (ajusta según sea necesario)
+  },
+});
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('./models/usuario.models'); // Ruta a tu modelo de usuario
@@ -16,6 +25,7 @@ const authRoutes = require('./routes/authRoutes');
 const { obtenerUsuarios } = require('./controllers/authController');
 const { authenticateJWT } = require('./middlewares/authMiddleware');
 const horarioRoutes = require('./routes/horarioRoutes');
+const gpsRoutes = require('./routes/gpsRoutes'); // Importa las rutas de GPS
 const generarHash = async (password) => {
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
@@ -42,6 +52,9 @@ mongoose.connect(process.env.MONGODB_URI, {
   console.error("❌ Error al conectar a MongoDB:", error);
 });
 
+// Inicia la consulta periódica y pasa la instancia de io
+iniciarConsultaPeriodica(io);
+
 // =============================
 // Definir rutas de la API
 // =============================
@@ -57,6 +70,8 @@ app.use('/api', transporteRoutes); // Rutas de transporte
 app.use('/api/auth', authRoutes); // Rutas de autenticación
 app.use('/api/horarios', horarioRoutes); // Rutas de horarios
 app.use('/api', usuariosRoutes);
+app.use('/api/gps', gpsRoutes); // Registra las rutas bajo el prefijo /api/gps
+app.use('/api', gpsRoutes); // Registra las rutas bajo el prefijo /api
 
 
 app.use('/api/protected-route', authenticateJWT, (req, res) => {
@@ -102,19 +117,7 @@ const login = async (req, res) => {
 // =============================
 
 // 1. Importamos el módulo 'http' y creamos un servidor HTTP basado en Express
-const http = require('http');
-const server = http.createServer(app);
-
 // 2. Importamos Socket.IO y lo configuramos
-const { Server } = require("socket.io");
-const io = new Server(server, {
-  cors: {
-    origin: "*", // Permite todas las conexiones (puedes cambiarlo por una URL específica si es necesario)
-    methods: ["GET", "POST"],
-    allowedHeaders: ["Content-Type"],
-    credentials: true,  // Habilitar credenciales si las necesitas
-  }
-});
 // 3. Escuchar eventos de conexión y desconexión de clientes WebSocket
 io.on("connection", (socket) => {
   console.log("🔗 Nuevo cliente conectado:", socket.id);
@@ -149,72 +152,8 @@ io.on("connection", (socket) => {
   });
 });
 
-// =============================
-// Integración con Flespi para obtener ubicación en tiempo real
-// =============================
-
-const FLESPI_TOKEN = "R4LrxOHIA7De8z1hUOCiLbxE7BUNpUKSif9yzByr9mcTIPe6BQ0cc9Wkip3F4SNL";
-const DEVICE_ID = "6267248"; // ID del dispositivo en Flespi
-const FLESPI_URL = `https://flespi.io/gw/devices/${DEVICE_ID}/messages?`;
-
-const obtenerUbicacionDesdeFlespi = async () => {
-  try {
-    const response = await fetch(FLESPI_URL, {
-      method: "GET",
-      headers: {
-        "Authorization": `FlespiToken ${FLESPI_TOKEN}`,
-        "Content-Type": "application/json"
-      }
-    });
-
-    const data = await response.json();
-
-    if (data.result && data.result.length > 0) {
-      const mensaje = data.result.reduce((max, item) => 
-        item.timestamp > max.timestamp ? item : max, data.result[0]);
-
-      if (!mensaje) {
-        console.log("⚠️ No se encontraron mensajes con coordenadas.");
-        return null;
-      }
-
-      console.log("🔍 Contenido del mensaje:", JSON.stringify(mensaje, null, 2));
-
-      const latitud = mensaje["position.latitude"];
-      const longitud = mensaje["position.longitude"];
-      const timestamp = mensaje.timestamp || null;
-
-      console.log("🔍 Coordenadas recibidas:", latitud, longitud);
-
-      const ubicacion = {
-        latitud,
-        longitud,
-        tipo: "gps_transporte",
-        timestamp
-      };
-
-      console.log("📌 Ubicación enviada:", ubicacion);
-      return ubicacion;
-    } else {
-      console.log("⚠️ No se encontraron datos en la respuesta de Flespi.");
-      return null;
-    }
-  } catch (error) {
-    console.error("❌ Error al obtener datos desde Flespi:", error);
-    return null;
-  }
-};
 
 
-// Consulta periódica de la ubicación cada 5 segundos
-setInterval(async () => {
-  const ubicacion = await obtenerUbicacionDesdeFlespi(); // Obtener datos de Flespi
-
-  if (ubicacion) {
-    console.log("🚀 Enviando ubicación actualizada:", ubicacion);
-    io.emit("ubicacionActualizada", ubicacion); // Enviar ubicación a los clientes WebSocket
-  }
-}, 5000);
 
 // =============================
 // Inicio del servidor HTTP

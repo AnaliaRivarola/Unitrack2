@@ -2,11 +2,11 @@
 const Transporte = require('../models/transporte.models');
 const Parada = require('../models/parada.models');
 const Auditoria = require('../models/auditoria.models');
-
+const GPS = require('../models/gps.models');
 // Crear un nuevo transporte
 exports.createTransporte = async (req, res) => {
   try {
-    const { nombre, id_usuario, coban_id, paradas } = req.body;
+    const { nombre, id_usuario, paradas, gpsId } = req.body;
 
     // Validar que las paradas sean IDs válidos de paradas existentes
     const paradasValidas = await Parada.find({ '_id': { $in: paradas.map(p => p.parada) } });
@@ -14,11 +14,21 @@ exports.createTransporte = async (req, res) => {
       return res.status(400).json({ message: 'Algunas paradas no son válidas' });
     }
 
+    // Validar que el GPS exista si se proporciona un gpsId
+    let gps = null;
+    if (gpsId) {
+      gps = await GPS.findById(gpsId);
+      if (!gps) {
+        return res.status(404).json({ message: 'GPS no encontrado' });
+      }
+    }
+
+    // Crear el nuevo transporte
     const nuevoTransporte = new Transporte({
       nombre,
       id_usuario,
-      coban_id,
       paradas,
+      gpsId: gps ? gps._id : null, // Asociar el GPS si se proporciona
     });
 
     await nuevoTransporte.save();
@@ -34,8 +44,8 @@ exports.createTransporte = async (req, res) => {
 
     res.status(201).json({ message: 'Transporte creado exitosamente', transporte: nuevoTransporte });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Error al crear el transporte' });
+    console.error('Error al crear transporte:', error);
+    res.status(500).json({ message: 'Error al crear el transporte', error: error.message });
   }
 };
 
@@ -76,7 +86,7 @@ exports.getTransporteById = async (req, res) => {
 // Editar un transporte
 exports.updateTransporte = async (req, res) => {
   try {
-    const { nombre, coban_id, paradas } = req.body;
+    const { nombre, paradas } = req.body;
 
     // Validar que las paradas sean IDs válidos de paradas existentes
     const paradasValidas = await Parada.find({ '_id': { $in: paradas.map(p => p.parada) } });
@@ -93,7 +103,6 @@ exports.updateTransporte = async (req, res) => {
 
     // Actualizar el transporte
     transporte.nombre = nombre || transporte.nombre;
-    transporte.coban_id = coban_id || transporte.coban_id;
     transporte.paradas = paradas || transporte.paradas;
     const transporteActualizado = await transporte.save();
 
@@ -142,3 +151,48 @@ exports.deleteTransporte = async (req, res) => {
   }
 };
 
+
+
+exports.asociarGpsATransporte = async (req, res) => {
+  const { transporteId, gpsId } = req.body;
+
+  try {
+    // Verifica si el transporte existe
+    const transporte = await Transporte.findById(transporteId);
+    if (!transporte) {
+      return res.status(404).json({ message: 'Transporte no encontrado' });
+    }
+
+    // Verifica si el GPS existe
+    const gps = await GPS.findById(gpsId);
+    if (!gps) {
+      return res.status(404).json({ message: 'GPS no encontrado' });
+    }
+
+    // Asocia el GPS al transporte
+    transporte.gpsId = gps._id;
+    await transporte.save();
+
+    res.status(200).json({ message: 'GPS asociado al transporte exitosamente', transporte });
+  } catch (error) {
+    console.error('Error al asociar GPS al transporte:', error);
+    res.status(500).json({ message: 'Error al asociar GPS al transporte', error: error.message });
+  }
+};
+
+exports.obtenerTransporteConGps = async (req, res) => {
+  const { transporteId } = req.params;
+
+  try {
+    // Busca el transporte y popula el GPS asociado
+    const transporte = await Transporte.findById(transporteId).populate('gpsId');
+    if (!transporte) {
+      return res.status(404).json({ message: 'Transporte no encontrado' });
+    }
+
+    res.status(200).json(transporte);
+  } catch (error) {
+    console.error('Error al obtener transporte con GPS:', error);
+    res.status(500).json({ message: 'Error al obtener transporte con GPS', error: error.message });
+  }
+};

@@ -6,7 +6,7 @@ const ParadaController = require('../controllers/ParadaController');
 const Parada = require('../models/parada.models');
 
 // Ruta para obtener todas las paradas
-router.get('/paradas', authenticateJWT, ParadaController.getParadas);
+router.get('/paradas', ParadaController.getParadas);
 
 // Ruta para crear una parada
 router.post('/paradas', authenticateJWT, ParadaController.createParada);

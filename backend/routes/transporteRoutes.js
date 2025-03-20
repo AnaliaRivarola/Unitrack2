@@ -33,4 +33,9 @@ router.get("/transportes/:id", TransporteController.getTransporteById);
 router.put("/transportes/:id", TransporteController.updateTransporte);
 router.delete("/transportes/:id", TransporteController.deleteTransporte);
 
+// Ruta para asociar un GPS a un transporte
+router.post('/asociar-gps', TransporteController.asociarGpsATransporte);
+
+// Ruta para obtener un transporte con su GPS asociado
+router.get('/:transporteId/gps', TransporteController.obtenerTransporteConGps);
 module.exports = router;

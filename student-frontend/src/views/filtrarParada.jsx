@@ -83,7 +83,6 @@ function FiltrarParada() {
                     <h5 className="mb-1">{parada.nombre}</h5>
                     <small>Latitud: {parada.ubicacion.latitud}, Longitud: {parada.ubicacion.longitud}</small>
                   </div>
-                  <button className="btn btn-primary btn-sm">Seleccionar</button>
                 </ListGroup.Item>
               ))
             ) : (
