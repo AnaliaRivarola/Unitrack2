@@ -51,6 +51,26 @@ const ChangeView = ({ center }) => {
   return null;
 };
 
+// Función para calcular la distancia usando Haversine
+const haversineDistance = (coords1, coords2) => {
+  const R = 6371e3; // Radio de la Tierra en metros
+  const toRadians = (degrees) => degrees * (Math.PI / 180);
+
+  const lat1 = toRadians(coords1.lat);
+  const lat2 = toRadians(coords2.lat);
+  const deltaLat = toRadians(coords2.lat - coords1.lat);
+  const deltaLng = toRadians(coords2.lng - coords1.lng);
+
+  const a =
+    Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
+    Math.cos(lat1) * Math.cos(lat2) *
+    Math.sin(deltaLng / 2) * Math.sin(deltaLng / 2);
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  return R * c; // Distancia en metros
+};
+
 export const MapView = () => {
   const [position, setPosition] = useState({ lat: -27.333, lng: -55.866 });
   const [noData, setNoData] = useState(false);
@@ -62,8 +82,9 @@ export const MapView = () => {
   // 📌 Estado para manejar el mensaje recibido del chofer
   const [mensajeChofer, setMensajeChofer] = useState("");
   const [showMensajeModal, setShowMensajeModal] = useState(false);
-
+  
   // Eliminamos el estado y la lógica de `selectedTransporte`
+  const [isButtonEnabled, setIsButtonEnabled] = useState(false);
 
   useEffect(() => {
     socket.on("choferEsperara", () => {
@@ -190,6 +211,14 @@ export const MapView = () => {
     }
   }, []);
 
+  useEffect(() => {
+    if (studentLocation && position) {
+      const distance = haversineDistance(studentLocation, position);
+      console.log("Distancia calculada:", distance, "metros");
+      setIsButtonEnabled(distance <= 1000); // Habilita si está a 100 metros o menos
+    }
+  }, [studentLocation, position]);
+
   return (
     <div>
       <ChoferEsperaModal show={showModal} setShow={setShowModal} />
@@ -201,7 +230,7 @@ export const MapView = () => {
         mensaje={mensajeChofer} 
       />
 
-      <MapContainer key={`${position.lat}-${position.lng}`} center={position} zoom={15} style={{ height: "calc(100vh - 60px)", width: "100%" }}>
+      <MapContainer key={`${position.lat}-${position.lng}`} center={position} zoom={50} style={{ height: "calc(100vh - 60px)", width: "100%" }}>
         <Sidebar />
         <ChangeView center={position} />
         <TileLayer
@@ -227,7 +256,11 @@ export const MapView = () => {
         ))}
       </MapContainer>
 
-      <button onClick={handleSendLocation} className="floating-button">
+      <button 
+        onClick={handleSendLocation} 
+        className="floating-button" 
+        disabled={!isButtonEnabled}
+      >
         Enviar mi ubicación
       </button>
 

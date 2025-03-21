@@ -6,6 +6,8 @@ const GPS = require('../models/gps.models');
 // Crear un nuevo transporte
 exports.createTransporte = async (req, res) => {
   try {
+    console.log("Datos recibidos en el backend:", req.body); // Verifica los datos recibidos
+
     const { nombre, id_usuario, paradas, gpsId } = req.body;
 
     // Validar que las paradas sean IDs válidos de paradas existentes
@@ -14,13 +16,14 @@ exports.createTransporte = async (req, res) => {
       return res.status(400).json({ message: 'Algunas paradas no son válidas' });
     }
 
-    // Validar que el GPS exista si se proporciona un gpsId
-    let gps = null;
-    if (gpsId) {
-      gps = await GPS.findById(gpsId);
-      if (!gps) {
-        return res.status(404).json({ message: 'GPS no encontrado' });
-      }
+    // Validar que el GPS exista
+    if (!gpsId) {
+      return res.status(400).json({ message: 'El campo gpsId es obligatorio' });
+    }
+
+    const gps = await GPS.findById(gpsId);
+    if (!gps) {
+      return res.status(404).json({ message: 'GPS no encontrado' });
     }
 
     // Crear el nuevo transporte
@@ -28,8 +31,10 @@ exports.createTransporte = async (req, res) => {
       nombre,
       id_usuario,
       paradas,
-      gpsId: gps ? gps._id : null, // Asociar el GPS si se proporciona
+      gpsId, // Asociar el GPS directamente
     });
+
+    console.log("Transporte a guardar:", nuevoTransporte); // Verifica el objeto antes de guardarlo
 
     await nuevoTransporte.save();
 
@@ -52,11 +57,11 @@ exports.createTransporte = async (req, res) => {
 // Obtener todos los transportes con las paradas pobladas
 exports.getAllTransportes = async (req, res) => {
   try {
-    const transportes = await Transporte.find().populate('paradas.parada'); // Esto traerá los detalles de las paradas
+    const transportes = await Transporte.find().populate('paradas.parada'); // Poblar las paradas relacionadas
     res.status(200).json(transportes);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Error al obtener los transportes' });
+    console.error("Error al obtener los transportes:", error);
+    res.status(500).json({ message: "Error al obtener los transportes" });
   }
 };
 
@@ -66,27 +71,27 @@ exports.getTransporteById = async (req, res) => {
 
   // Verificar si el ID tiene un formato válido
   if (!id.match(/^[0-9a-fA-F]{24}$/)) {
-    return res.status(400).json({ message: 'ID de transporte inválido' });
+    return res.status(400).json({ message: "ID de transporte inválido" });
   }
 
   try {
-    const transporte = await Transporte.findById(id).populate('paradas.parada'); // Poblar las paradas
+    const transporte = await Transporte.findById(id).populate("paradas.parada"); // Poblar las paradas
 
     if (!transporte) {
-      return res.status(404).json({ message: 'Transporte no encontrado' });
+      return res.status(404).json({ message: "Transporte no encontrado" });
     }
 
     res.status(200).json(transporte);
   } catch (error) {
-    console.error('Error al obtener transporte por ID:', error);
-    res.status(500).json({ message: 'Error del servidor' });
+    console.error("Error al obtener transporte por ID:", error);
+    res.status(500).json({ message: "Error del servidor" });
   }
 };
 
 // Editar un transporte
 exports.updateTransporte = async (req, res) => {
   try {
-    const { nombre, paradas } = req.body;
+    const { nombre, paradas, id_usuario, gpsId } = req.body;
 
     // Validar que las paradas sean IDs válidos de paradas existentes
     const paradasValidas = await Parada.find({ '_id': { $in: paradas.map(p => p.parada) } });
@@ -104,6 +109,8 @@ exports.updateTransporte = async (req, res) => {
     // Actualizar el transporte
     transporte.nombre = nombre || transporte.nombre;
     transporte.paradas = paradas || transporte.paradas;
+    transporte.id_usuario = id_usuario || transporte.id_usuario;
+    transporte.gpsId = gpsId || transporte.gpsId;
     const transporteActualizado = await transporte.save();
 
     // Registrar la acción en la tabla de auditoría
@@ -129,7 +136,12 @@ exports.deleteTransporte = async (req, res) => {
     const transporte = await Transporte.findById(req.params.id);
 
     if (!transporte) {
-      return res.status(404).json({ message: 'Transporte no encontrado' });
+      return res.status(404).json({ message: "Transporte no encontrado" });
+    }
+
+    // Verifica que req.usuario esté definido
+    if (!req.usuario || !req.usuario._id) {
+      return res.status(401).json({ message: "No autorizado. Usuario no autenticado." });
     }
 
     // Eliminar el transporte
@@ -138,16 +150,16 @@ exports.deleteTransporte = async (req, res) => {
     // Registrar la acción en la tabla de auditoría
     await Auditoria.create({
       usuario: req.usuario._id, // Usuario autenticado que realiza la acción
-      accion: 'eliminar',
-      entidad: 'transporte',
+      accion: "eliminar",
+      entidad: "transporte",
       entidadId: transporte._id,
       datosAnteriores: transporte, // Guarda los datos del transporte eliminado
     });
 
-    res.status(200).json({ message: 'Transporte eliminado exitosamente' });
+    res.status(200).json({ message: "Transporte eliminado exitosamente" });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Error al eliminar el transporte' });
+    console.error("Error al eliminar el transporte:", error);
+    res.status(500).json({ message: "Error al eliminar el transporte" });
   }
 };
 

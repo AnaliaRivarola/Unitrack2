@@ -3,7 +3,6 @@ import axios from "axios";
 
 export const CrearTransporte = () => {
   const [nombre, setNombre] = useState("");
-  const [cobanId, setCobanId] = useState("");
   const [usuarios, setUsuarios] = useState([]);
   const [paradas, setParadas] = useState([]);
   const [gpsDispositivos, setGpsDispositivos] = useState([]); // Lista de dispositivos GPS
@@ -45,15 +44,24 @@ export const CrearTransporte = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      console.log("GPS seleccionado:", gpsSeleccionado); // Verifica el valor del GPS seleccionado
+
+      if (!gpsSeleccionado) {
+        alert("Debe seleccionar un GPS para el transporte.");
+        return;
+      }
+
       const nuevoTransporte = {
         nombre,
         id_usuario: idUsuario,
         paradas: paradasSeleccionadas.map(parada => ({
           parada,
-          ubicacion: "Ubicación asignada", // Puedes hacer esto más dinámico
+          ubicacion: "Ubicación asignada",
         })),
         gpsId: gpsSeleccionado, // Asociar el GPS seleccionado
       };
+
+      console.log("Datos enviados al backend:", nuevoTransporte); // Verifica los datos enviados
 
       await axios.post("http://localhost:5000/api/transportes", nuevoTransporte);
       alert("Transporte creado con éxito");
