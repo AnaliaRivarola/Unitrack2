@@ -19,3 +19,8 @@
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);  /* Sombra más fuerte al hacer hover */
   }
   
+  @media (max-width: 768px) {
+    .floating-button {
+        bottom: 120px; /* Mueve el botón más arriba en dispositivos móviles */
+    }
+}

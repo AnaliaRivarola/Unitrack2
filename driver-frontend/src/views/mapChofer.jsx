@@ -5,10 +5,13 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import io from "socket.io-client";
 import L from "leaflet";
+import { Navbar } from 'shared-frontend/components/Navbar';
+import { Footer } from 'shared-frontend/components/Footer';
 import markerIcon from "../assets/icono2.png";
 import studentIcon from "../assets/student.png";
 import StudentLocationModal from "../components/modal/StudentLocationModal.jsx";
 import '../styles/mapChofer.css';
+
 
 const socket = io("http://localhost:5000");
 
@@ -81,6 +84,8 @@ export const MapView = () => {
   }, [lastUpdate]);
 
   return (
+    <>
+    <Navbar logoSrc="../src/assets/driver2.png" altText="Logo" />
     <div>
       <MapContainer center={busPosition} zoom={15} style={{ height: "100vh", width: "100%" }}>
         <ChangeView center={busPosition} />
@@ -108,5 +113,7 @@ export const MapView = () => {
         Enviar Mensaje
       </button>
     </div>
+    <Footer />
+    </>
   );
 };

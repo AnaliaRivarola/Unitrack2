@@ -4,36 +4,43 @@
 }
 
 .navbar {
-  display: flex; /* Cambiado a flex para centrar el contenido */
-  justify-content: center; /* Centra horizontalmente el contenido */
-  align-items: center; /* Centra verticalmente el contenido */
+  display: flex; /* Usa flexbox para alinear los elementos */
+  align-items: center; /* Alinea los elementos verticalmente */
+  justify-content: space-between; /* Espacia los elementos horizontalmente */
   height: 80px; /* Altura del Navbar */
   background-color: #A0D4DF; /* Color de fondo */
   color: white;
-  padding: 0; /* Elimina cualquier padding adicional */
+  padding: 0 15px; /* Espaciado horizontal */
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
+  z-index: 1000; /* Asegura que el Navbar esté por encima de otros elementos */
 }
 
 /* Contenedor del logo */
 .navbar-logo-container {
   display: flex;
-  justify-content: center; /* Centra horizontalmente */
-  align-items: center; /* Centra verticalmente */
-  width: 100%; /* Asegura que ocupe todo el ancho del Navbar */
-  height: 100%; /* Asegura que ocupe toda la altura del Navbar */
-  margin: 0;
-  padding: 0;
+  justify-content: center; /* Centra el logo horizontalmente */
+  align-items: center; /* Centra el logo verticalmente */
+  flex: 1; /* Permite que el logo ocupe el espacio central */
 }
 
 /* Logo de la barra de navegación */
 .navbar-logo {
-  max-height: 40px; /* Ajusta el tamaño de la imagen */
-  max-width: 100%;
-  float: none; /* Asegúrate de que no esté flotando */
-  margin: 0 auto; /* Centra el logo si hay algún margen heredado */
+  max-height: 40px; /* Ajusta el tamaño máximo del logo */
+  max-width: 100%; /* Asegura que el logo no se desborde */
+}
+
+/* Botón de flecha */
+.navbar-back-button {
+  background: transparent; /* Fondo transparente */
+  border: none; /* Sin bordes */
+  font-size: 2.5rem; /* Tamaño de la flecha */
+  cursor: pointer; /* Cambia el cursor al pasar sobre el botón */
+  flex-shrink: 0; /* Evita que el botón se reduzca */
+  margin-left: 20px;
+  color: white;
 }
 
 /* Media query para pantallas pequeñas (móviles) */
@@ -51,7 +58,7 @@
 /* Media query para pantallas grandes (escritorio) */
 @media (min-width: 769px) {
   .navbar {
-    height: 60px; /* Asegura una altura más grande para pantallas grandes */
+    height: 80px; /* Asegura una altura más grande para pantallas grandes */
   }
 
   .navbar-logo {

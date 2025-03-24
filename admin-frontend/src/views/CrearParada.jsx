@@ -72,11 +72,20 @@ export const CrearParada = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5000/api/paradas', formData);
+      // Obtén el token desde el almacenamiento local
+      const token = localStorage.getItem('token');
+
+      // Configura los encabezados con el token
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`, // Agrega el token en el encabezado Authorization
+        },
+      };
+
+      // Envía la solicitud con el token
+      const response = await axios.post('http://localhost:5000/api/paradas', formData, config);
       setMessage('Parada creada exitosamente.');
       setFormData({ nombre: '', ubicacion: { latitud: '', longitud: '' } });
-
-      // Redirigir al usuario a /admin/gestionar-paradas después de crear la parada
       navigate('/admin/gestionar-paradas');
     } catch (error) {
       console.error('Error al crear la parada:', error.response ? error.response.data : error.message);

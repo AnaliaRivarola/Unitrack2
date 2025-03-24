@@ -203,7 +203,7 @@ export const MapView = () => {
         },
         {
           enableHighAccuracy: true,
-          timeout: 10000,
+          timeout: 20000,
           maximumAge: 0
         }
       );
@@ -228,7 +228,7 @@ export const MapView = () => {
     if (studentLocation && position) {
       const distance = haversineDistance(studentLocation, position);
       console.log("Distancia calculada:", distance, "metros");
-      setIsButtonEnabled(distance <= 1000); // Habilita si está a 100 metros o menos
+      setIsButtonEnabled(distance <= 3000); // Habilita si está a 100 metros o menos
     }
   }, [studentLocation, position]);
 

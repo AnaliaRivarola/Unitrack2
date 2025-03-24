@@ -26,10 +26,10 @@ const ChoferEsperaModal = ({ show, setShow }) => {
     <>
       <Modal show={show} onHide={handleClose} centered className="custom-chofer-modal">
         <Modal.Header closeButton>
-          <Modal.Title>El chofer te esperará</Modal.Title>
+          <Modal.Title>El chofer te esperará 5 minutos </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          El chofer ha confirmado que esperará por ti. ¡Apúrate para llegar!
+          El chofer ha confirmado que esperará por ti maximo hasta 5 minutos luego de llegar al lugar de espera.  ¡Apúrate para llegar!
         </Modal.Body>
         <Modal.Footer>
           <Button variant="primary" onClick={handleClose}>
