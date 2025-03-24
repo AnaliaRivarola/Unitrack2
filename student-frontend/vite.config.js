@@ -43,8 +43,6 @@ export default defineConfig({
     include: ['shared-frontend'], // Asegúrate de incluir shared-frontend
   },
   build: {
-    rollupOptions: {
-      external: ['react-router-dom'], // Externaliza react-router-dom
-    },
+    rollupOptions: {},
   },
 });
