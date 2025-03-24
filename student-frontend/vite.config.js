@@ -39,4 +39,12 @@ export default defineConfig({
       'shared-frontend': path.resolve(__dirname, '../shared-frontend'), // <-- Esta es la clave
     },
   },
+  optimizeDeps: {
+    include: ['shared-frontend'], // Asegúrate de incluir shared-frontend
+  },
+  build: {
+    rollupOptions: {
+      external: ['react-router-dom'], // Externaliza react-router-dom
+    },
+  },
 });
