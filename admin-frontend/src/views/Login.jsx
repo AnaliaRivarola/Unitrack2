@@ -29,8 +29,8 @@ const Login = () => {
       localStorage.setItem('rol', rol);
   
       // Definir las URLs de cada aplicación
-      const adminURL = 'http://localhost:5173';
-      const driverURL = 'http://localhost:5174';
+      const adminURL = 'http://localhost:5174';
+      const driverURL = 'http://localhost:5173';
 
       // Redirigir a la app correspondiente
       if (rol === 'admin') {

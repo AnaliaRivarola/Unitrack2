@@ -46,8 +46,11 @@ const GestionarHorarios = () => {
   };
 
   return (
+
+    <>
+     <Navbar logoSrc="../src/assets/logoLetra.png" altText="Logo" />
     <div id="gestion-horarios-container">
-      <Navbar logoSrc="../src/assets/logoLetra.png" altText="Logo" />
+
       <h2 id="gestion-horarios-title">Gestionar Horarios</h2>
       <div id="crear-horario-btn-container">
         <Link to="/admin/crear-horario">
@@ -91,8 +94,10 @@ const GestionarHorarios = () => {
           ))}
         </tbody>
       </table>
-      <Footer />
+      
     </div>
+    <Footer />
+  </>
   );
 };
 

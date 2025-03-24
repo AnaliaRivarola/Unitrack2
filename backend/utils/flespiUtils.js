@@ -1,6 +1,6 @@
 const fetch = require('node-fetch');
 const GPS = require('../models/gps.models'); // Importa el modelo de GPS
-
+const Transporte = require('../models/transporte.models'); // Importa el modelo Transporte
 // Función para obtener la ubicación de un dispositivo GPS desde Flespi
 const obtenerUbicacionDesdeFlespi = async (dispositivoId) => {
   try {
@@ -74,8 +74,22 @@ const iniciarConsultaPeriodica = (io) => {
         const ubicacion = await obtenerUbicacionDesdeFlespi(dispositivo.dispositivoId);
 
         if (ubicacion) {
-          console.log(`🚀 Enviando ubicación actualizada para el dispositivo ${dispositivo.dispositivoId}:`, ubicacion);
-          io.emit('ubicacionActualizada', { dispositivoId: dispositivo.dispositivoId, ...ubicacion }); // Enviar ubicación a los clientes WebSocket
+          // Busca el transporte relacionado con el GPS
+          const transporte = await Transporte.findOne({ gpsId: dispositivo._id }).select('nombre').lean();
+
+          if (!transporte) {
+            console.warn(`⚠️ No se encontró un transporte relacionado con el dispositivo ${dispositivo.dispositivoId}.`);
+            continue; // Si no hay transporte relacionado, pasa al siguiente dispositivo
+          }
+
+                    console.log(`🚀 Enviando ubicación actualizada para el dispositivo ${dispositivo.dispositivoId}:`, ubicacion, transporte.nombre);
+
+          // Emitir la ubicación junto con el nombre del transporte
+          io.emit('ubicacionActualizada', {
+            dispositivoId: dispositivo.dispositivoId,
+            ...ubicacion,
+            nombreTransporte: transporte.nombre, // Incluye el nombre del transporte
+          });
         }
       }
     } catch (error) {

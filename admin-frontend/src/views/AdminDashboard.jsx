@@ -20,8 +20,9 @@ export const AdminDashboard = () => {
   };
 
   return (
+<>
+    <Navbar logoSrc="../src/assets/logoLetra.png" altText="Logo" />
     <div className="admin-dashboard-container">
-      <Navbar logoSrc="../src/assets/logoLetra.png" altText="Logo" />
 
       <div className="dashboard-content">
         <h1>Panel de Control - Administrador</h1>
@@ -47,7 +48,9 @@ export const AdminDashboard = () => {
         </button>
       </div>
 
-      <Footer /> {/* Coloca el Footer en la parte inferior */}
+      
     </div>
+    <Footer /> {/* Coloca el Footer en la parte inferior */}
+    </>
   );
 };

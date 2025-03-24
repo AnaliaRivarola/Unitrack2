@@ -4,6 +4,10 @@ const TransporteController = require("../controllers/TransporteController");
 const Transporte = require("../models/transporte.models");
 const { authenticateJWT, verifyRole } = require('../middlewares/authMiddleware');
 // Crear un transporte
+
+router.post("/transportes",authenticateJWT, verifyRole(['admin', 'superadmin']),  TransporteController.createTransporte);
+
+
 router.get("/transportes", async (req, res) => {
   console.log("Solicitud recibida en /transportes");
   try {

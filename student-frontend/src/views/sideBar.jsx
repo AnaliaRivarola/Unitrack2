@@ -7,10 +7,31 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js";
 const Sidebar = () => {
   const navigate = useNavigate(); // Inicializa useNavigate
 
-  // Función para manejar la redirección al hacer clic en el botón
-  const handleNavigate = () => {
+  // Función para manejar la redirección al hacer clic en el botón "Ver Horarios"
+  const handleNavigateHorarios = () => {
     navigate("/horarios"); // Redirige a /horarios
   };
+
+  // Función para manejar la redirección al hacer clic en el botón "Ver Paradas con Transporte"
+  const handleNavigateParadas = () => {
+    navigate("/paradas-con-transportes"); // Redirige a /paradas-con-transportes
+  };
+
+    
+    const handleNavigateFAQ = () => {
+      navigate("/faq"); 
+    };
+
+    const handleNavigateNormas = () => {
+      navigate("/normas-de-uso"); 
+    };
+
+    const handleNavigatePoliticas = () => {
+      navigate("/politicas"); 
+    };
+    const handleNavigateContacto = () => {
+      navigate("/contacto"); 
+    };
 
   return (
     <>
@@ -43,22 +64,55 @@ const Sidebar = () => {
         </div>
         <div className="offcanvas-body">
           <ul className="list-group">
-            <li className="list-group-item">
               {/* Botón para redirigir a /horarios */}
               <button
                 className="btn btn-light w-100 text-start"
-                onClick={handleNavigate} // Usamos onClick para redirigir
+                onClick={handleNavigateHorarios} // Usamos onClick para redirigir
                 data-bs-dismiss="offcanvas"
               >
                 Ver Horarios
               </button>
-            </li>
-            <li className="list-group-item">
-              <a href="#" className="text-decoration-none" data-bs-dismiss="offcanvas">Opción 2</a>
-            </li>
-            <li className="list-group-item">
-              <a href="#" className="text-decoration-none" data-bs-dismiss="offcanvas">Opción 3</a>
-            </li>
+
+              {/* Botón para redirigir a /paradas-con-transportes */}
+              <button
+                className="btn btn-light w-100 text-start"
+                onClick={handleNavigateParadas} // Usamos onClick para redirigir
+                data-bs-dismiss="offcanvas"
+              >
+                Ver Paradas con Transporte
+              </button>
+
+            <button
+                className="btn btn-light w-100 text-start"
+                onClick={handleNavigateFAQ} // Usamos onClick para redirigir
+                data-bs-dismiss="offcanvas"
+              >
+                Preguntas Frecuentes (FAQ)
+              </button>
+
+              <button
+                className="btn btn-light w-100 text-start"
+                onClick={handleNavigateNormas} // Usamos onClick para redirigir
+                data-bs-dismiss="offcanvas"
+              >
+                Normas de Uso
+              </button>
+
+              <button
+                className="btn btn-light w-100 text-start"
+                onClick={handleNavigatePoliticas} // Usamos onClick para redirigir
+                data-bs-dismiss="offcanvas"
+              >
+                Politicas de Privacidad
+              </button>
+
+              <button
+                className="btn btn-light w-100 text-start"
+                onClick={handleNavigateContacto} // Usamos onClick para redirigir
+                data-bs-dismiss="offcanvas"
+              >
+                Contacto
+              </button>
           </ul>
         </div>
       </div>

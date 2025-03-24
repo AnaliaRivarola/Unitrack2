@@ -8,6 +8,8 @@ import '../styles/GestionarParada.css';
 
 export const GestionarParadas = () => {
   const [paradas, setParadas] = useState([]);
+  const [transportes, setTransportes] = useState([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   // Función para obtener la lista de paradas desde el backend
@@ -51,9 +53,31 @@ export const GestionarParadas = () => {
     fetchParadas();
   }, []);
 
+  useEffect(() => {
+    const fetchTransportes = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.get("http://localhost:5000/api/transportes", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        console.log("Transportes recibidos:", response.data); // Verifica los datos recibidos
+        setTransportes(response.data);
+      } catch (error) {
+        console.error("Error al obtener transportes:", error.response?.data || error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTransportes();
+  }, []);
+
   return (
+    <>
+     <Navbar logoSrc="../src/assets/logoLetra.png" altText="Logo" />
     <div className="gestionar-paradas-container">
-      <Navbar logoSrc="../src/assets/logoLetra.png" altText="Logo" />
       <div className="header">
         <h1>Gestionar Paradas</h1>
         <button onClick={() => navigate('/admin/crear-parada')} className="crear-parada-btn">
@@ -86,7 +110,9 @@ export const GestionarParadas = () => {
           <p>No hay paradas disponibles.</p>
         )}
       </div>
-      <Footer /> {/* Coloca el Footer en la parte inferior */}
+    
     </div>
+    <Footer /> {/* Coloca el Footer en la parte inferior */}
+    </>
   );
 };

@@ -3,7 +3,8 @@ import "../styles/Footer.css";
 export const Footer = () => {
   return (
     <div className="footer">
-      <p>&copy; Analia Rivarola</p>
+      <p>App de Seguimiento en tiempo real de transportes universitarios</p>
+      <p>&copy; Analia Rivarola - TFG 2025</p>
     </div>
   );
 };

@@ -72,7 +72,7 @@ const haversineDistance = (coords1, coords2) => {
 };
 
 export const MapView = () => {
-  const [position, setPosition] = useState({ lat: -27.333, lng: -55.866 });
+  const [position, setPosition] = useState({ lat: -27.333, lng: -55.866, nombreTransporte: "" });
   const [noData, setNoData] = useState(false);
   const [lastUpdate, setLastUpdate] = useState(Date.now());
   const [studentLocation, setStudentLocation] = useState(null);
@@ -133,6 +133,7 @@ export const MapView = () => {
         setPosition({
           lat: data.latitud,
           lng: data.longitud,
+          nombreTransporte: data.nombreTransporte || "Sin nombre", // Incluye el nombre del transporte
         });
         setNoData(false);
         setLastUpdate(Date.now());
@@ -212,6 +213,18 @@ export const MapView = () => {
   }, []);
 
   useEffect(() => {
+    navigator.permissions.query({ name: "geolocation" }).then((result) => {
+      if (result.state === "granted") {
+        console.log("Permiso concedido para acceder a la ubicación.");
+      } else if (result.state === "prompt") {
+        console.log("El navegador pedirá permiso para acceder a la ubicación.");
+      } else if (result.state === "denied") {
+        console.log("Permiso denegado. Pide al usuario que lo habilite manualmente.");
+      }
+    });
+  }, []);
+
+  useEffect(() => {
     if (studentLocation && position) {
       const distance = haversineDistance(studentLocation, position);
       console.log("Distancia calculada:", distance, "metros");
@@ -220,6 +233,8 @@ export const MapView = () => {
   }, [studentLocation, position]);
 
   return (
+    <>
+     <Navbar logoSrc="../src/assets/logoLetra.png" altText="Logo" />
     <div>
       <ChoferEsperaModal show={showModal} setShow={setShowModal} />
       
@@ -230,7 +245,7 @@ export const MapView = () => {
         mensaje={mensajeChofer} 
       />
 
-      <MapContainer key={`${position.lat}-${position.lng}`} center={position} zoom={50} style={{ height: "calc(100vh - 60px)", width: "100%" }}>
+      <MapContainer key={`${position.lat}-${position.lng}`} center={position} zoom={70} style={{ height: "calc(100vh - 60px)", width: "100%" }}>
         <Sidebar />
         <ChangeView center={position} />
         <TileLayer
@@ -238,10 +253,12 @@ export const MapView = () => {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
         <Marker position={position} icon={busIcon}>
-          <Popup>
-            {noData ? "⚠️ Sin actualización de ubicación" : "🚍 Transporte en tiempo real"}
-          </Popup>
-        </Marker>
+        <Popup>
+          {noData
+            ? "⚠️ Sin actualización de ubicación"
+            : `🚍  Nombre del Transporte: ${position.nombreTransporte}`}
+        </Popup>
+      </Marker>
 
         {studentLocation && (
           <Marker position={studentLocation} icon={studentLocationIcon}>
@@ -266,5 +283,7 @@ export const MapView = () => {
 
       <Footer />
     </div>
+
+    </>
   );
 };

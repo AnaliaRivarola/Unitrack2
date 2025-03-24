@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Table, Container, Spinner } from "react-bootstrap";
+import { Navbar } from 'shared-frontend/components/Navbar';
+import { Footer } from 'shared-frontend/components/Footer';
 
 const HorariosDisponibles = () => {
   const [horarios, setHorarios] = useState([]);
@@ -19,6 +21,8 @@ const HorariosDisponibles = () => {
   }, []);
 
   return (
+    <>
+    <Navbar logoSrc="../src/assets/logoLetra.png" altText="Logo" />
     <Container className="mt-4">
       <h2 className="text-center mb-4">Horarios Disponibles</h2>
       
@@ -58,6 +62,8 @@ const HorariosDisponibles = () => {
         </Table>
       )}
     </Container>
+    <Footer />
+    </>
   );
 };
 

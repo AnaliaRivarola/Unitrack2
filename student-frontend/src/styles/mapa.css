@@ -12,16 +12,22 @@
     font-size: 16px;
     cursor: pointer;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);  /* Sombra */
-  }
-  
-  .floating-button:hover {
+}
+
+.floating-button:hover {
     background-color: #A0D4DF;
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);  /* Sombra más fuerte al hacer hover */
-  }
+}
 
-  .floating-button:disabled {
+.floating-button:disabled {
     background-color: #cccccc; /* Color del botón deshabilitado */
     color: #666666; /* Color del texto deshabilitado */
     cursor: not-allowed;
-  }
-  
+}
+
+/* Media query para dispositivos móviles */
+@media (max-width: 768px) {
+    .floating-button {
+        bottom: 120px; /* Mueve el botón más arriba en dispositivos móviles */
+    }
+}

@@ -1,51 +1,50 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import Select from "react-select"; // Importa react-select
+import { Navbar } from 'shared-frontend/components/Navbar';  // Asegúrate de que el Navbar esté importado
+import { Footer } from 'shared-frontend/components/Footer';
 
 export const CrearTransporte = () => {
   const [nombre, setNombre] = useState("");
   const [usuarios, setUsuarios] = useState([]);
   const [paradas, setParadas] = useState([]);
-  const [gpsDispositivos, setGpsDispositivos] = useState([]); // Lista de dispositivos GPS
+  const [gpsDispositivos, setGpsDispositivos] = useState([]);
   const [idUsuario, setIdUsuario] = useState("");
   const [paradasSeleccionadas, setParadasSeleccionadas] = useState([]);
-  const [gpsSeleccionado, setGpsSeleccionado] = useState(""); // GPS seleccionado
+  const [gpsSeleccionado, setGpsSeleccionado] = useState("");
 
-  // Obtener usuarios, paradas y dispositivos GPS al cargar el componente
   useEffect(() => {
     axios.get("http://localhost:5000/api/paradas")
-      .then(response => setParadas(response.data))
-      .catch(error => console.error("Error al obtener paradas:", error));
+      .then((response) => setParadas(response.data))
+      .catch((error) => console.error("Error al obtener paradas:", error));
 
-    axios.get("http://localhost:5000/api/gps") // Endpoint para obtener dispositivos GPS
-      .then(response => setGpsDispositivos(response.data))
-      .catch(error => console.error("Error al obtener dispositivos GPS:", error));
+    axios.get("http://localhost:5000/api/gps")
+      .then((response) => setGpsDispositivos(response.data))
+      .catch((error) => console.error("Error al obtener dispositivos GPS:", error));
   }, []);
 
   useEffect(() => {
     const fetchUsuarios = async () => {
       try {
-        const token = localStorage.getItem('token'); // Obtén el token del almacenamiento local
-        const response = await axios.get('http://localhost:5000/api/auth/usuarios', {
+        const token = localStorage.getItem("token");
+        const response = await axios.get("http://localhost:5000/api/auth/usuarios", {
           headers: {
-            Authorization: `Bearer ${token}`, // Agrega el token en los encabezados
+            Authorization: `Bearer ${token}`,
           },
         });
 
-        setUsuarios(response.data.usuarios); // Asigna los usuarios al estado
+        setUsuarios(response.data.usuarios);
       } catch (error) {
-        console.error('Error al obtener usuarios:', error);
+        console.error("Error al obtener usuarios:", error);
       }
     };
 
     fetchUsuarios();
   }, []);
 
-  // Manejar envío del formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      console.log("GPS seleccionado:", gpsSeleccionado); // Verifica el valor del GPS seleccionado
-
       if (!gpsSeleccionado) {
         alert("Debe seleccionar un GPS para el transporte.");
         return;
@@ -54,16 +53,30 @@ export const CrearTransporte = () => {
       const nuevoTransporte = {
         nombre,
         id_usuario: idUsuario,
-        paradas: paradasSeleccionadas.map(parada => ({
+        paradas: paradasSeleccionadas.map((parada) => ({
           parada,
           ubicacion: "Ubicación asignada",
         })),
-        gpsId: gpsSeleccionado, // Asociar el GPS seleccionado
+        gpsId: gpsSeleccionado,
       };
 
-      console.log("Datos enviados al backend:", nuevoTransporte); // Verifica los datos enviados
+      console.log("Datos enviados al backend:", nuevoTransporte);
 
-      await axios.post("http://localhost:5000/api/transportes", nuevoTransporte);
+      // Obtén el token del almacenamiento local
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        alert("No se encontró un token de autenticación. Por favor, inicia sesión.");
+        return;
+      }
+
+      // Envía la solicitud POST con el token en los encabezados
+      await axios.post("http://localhost:5000/api/transportes", nuevoTransporte, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
       alert("Transporte creado con éxito");
       setNombre("");
       setIdUsuario("");
@@ -75,20 +88,39 @@ export const CrearTransporte = () => {
     }
   };
 
+  // Convierte las paradas en un formato compatible con react-select
+  const opcionesParadas = paradas.map((parada) => ({
+    value: parada._id,
+    label: parada.nombre,
+  }));
+
   return (
-    <div>
-      <h2>Crear Nuevo Transporte</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Nombre del Transporte:</label>
-          <input type="text" value={nombre} onChange={(e) => setNombre(e.target.value)} required />
+    <>
+    <Navbar logoSrc="../src/assets/logoLetra.png" altText="Logo" />
+    <div className="container mt-5">
+      <h2 className="text-center mb-4">Crear Nuevo Transporte</h2>
+      <form onSubmit={handleSubmit} className="p-4 shadow rounded bg-light">
+        <div className="mb-3">
+          <label className="form-label">Nombre del Transporte:</label>
+          <input
+            type="text"
+            className="form-control"
+            value={nombre}
+            onChange={(e) => setNombre(e.target.value)}
+            required
+          />
         </div>
 
-        <div>
-          <label>Seleccionar Usuario:</label>
-          <select value={idUsuario} onChange={(e) => setIdUsuario(e.target.value)} required>
+        <div className="mb-3">
+          <label className="form-label">Seleccionar Usuario:</label>
+          <select
+            className="form-select"
+            value={idUsuario}
+            onChange={(e) => setIdUsuario(e.target.value)}
+            required
+          >
             <option value="">Seleccione un usuario</option>
-            {usuarios.map(usuario => (
+            {usuarios.map((usuario) => (
               <option key={usuario._id} value={usuario._id}>
                 {usuario.nombre}
               </option>
@@ -96,27 +128,30 @@ export const CrearTransporte = () => {
           </select>
         </div>
 
-        <div>
-          <label>Seleccionar Paradas:</label>
-          <select
-            multiple
-            value={paradasSeleccionadas}
-            onChange={(e) => setParadasSeleccionadas([...e.target.selectedOptions].map(o => o.value))}
-            required
-          >
-            {paradas.map(parada => (
-              <option key={parada._id} value={parada._id}>
-                {parada.nombre}
-              </option>
-            ))}
-          </select>
+        <div className="mb-3">
+          <label className="form-label">Seleccionar Paradas:</label>
+          <Select
+            isMulti
+            options={opcionesParadas}
+            value={paradasSeleccionadas.map((id) =>
+              opcionesParadas.find((op) => op.value === id)
+            )}
+            onChange={(selectedOptions) =>
+              setParadasSeleccionadas(selectedOptions.map((option) => option.value))
+            }
+            placeholder="Seleccione las paradas..."
+          />
         </div>
 
-        <div>
-          <label>Seleccionar GPS:</label>
-          <select value={gpsSeleccionado} onChange={(e) => setGpsSeleccionado(e.target.value)}>
+        <div className="mb-3">
+          <label className="form-label">Seleccionar GPS:</label>
+          <select
+            className="form-select"
+            value={gpsSeleccionado}
+            onChange={(e) => setGpsSeleccionado(e.target.value)}
+          >
             <option value="">Seleccione un GPS</option>
-            {gpsDispositivos.map(gps => (
+            {gpsDispositivos.map((gps) => (
               <option key={gps._id} value={gps._id}>
                 {gps.descripcion || gps.dispositivoId}
               </option>
@@ -124,9 +159,13 @@ export const CrearTransporte = () => {
           </select>
         </div>
 
-        <button type="submit">Crear Transporte</button>
+        <button type="submit" className="btn btn-primary w-100">
+          Crear Transporte
+        </button>
       </form>
     </div>
+    <Footer />
+    </>
   );
 };
 

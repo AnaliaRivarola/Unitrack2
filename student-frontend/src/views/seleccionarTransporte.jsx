@@ -3,6 +3,8 @@ import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, ListGroup, Button, Alert, Spinner } from 'react-bootstrap';
 import "../styles/seleccionarTransporte.css";
+import { Navbar } from 'shared-frontend/components/Navbar';
+import { Footer } from 'shared-frontend/components/Footer';
 
 function SeleccionarTransportes() {
   const { paradaId } = useParams();  // Obtenemos el ID de la parada desde los parámetros de la URL
@@ -35,6 +37,8 @@ function SeleccionarTransportes() {
   };
 
   return (
+    <>
+    <Navbar logoSrc="../src/assets/logoLetra.png" altText="Logo" />
     <Container className="mt-4">
       {error && <Alert variant="danger">{error}</Alert>}  {/* Si hay un error, lo mostramos */}
 
@@ -72,6 +76,8 @@ function SeleccionarTransportes() {
         </Col>
       </Row>
     </Container>
+    <Footer />
+    </>
   );
 }
 

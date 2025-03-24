@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import { Navbar } from 'shared-frontend/components/Navbar';  // Asegúrate de que el Navbar esté importado
+import { Footer } from 'shared-frontend/components/Footer';
 
 export const TransporteList = () => {
   const [transportes, setTransportes] = useState([]);
@@ -55,61 +57,63 @@ export const TransporteList = () => {
   }, []);
 
   return (
-    <div>
-      <h1>Lista de Transportes</h1>
-      <div>
+    <>
+     <Navbar logoSrc="../src/assets/logoLetra.png" altText="Logo" />
+    <div className="container mt-5">
+      <h1 className="text-center mb-4">Lista de Transportes</h1>
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h2 className="h5">Gestión de Transportes</h2>
         <Link to="/admin/crear-transporte">
           <button className="btn btn-primary">Crear Transporte</button>
         </Link>
       </div>
       {loading ? (
-        <p>Cargando transportes...</p>
+        <div className="text-center">
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Cargando...</span>
+          </div>
+          <p className="mt-3">Cargando transportes...</p>
+        </div>
       ) : transportes.length === 0 ? (
-        <p>No hay transportes disponibles.</p>
+        <div className="alert alert-warning text-center" role="alert">
+          No hay transportes disponibles.
+        </div>
       ) : (
-        <table className="table">
-          <thead>
-            <tr>
-              <th>Nombre</th>
-              <th>GPS Relacionado</th>
-              <th>Paradas Relacionadas</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {transportes.map((transporte) => (
-              <tr key={transporte._id}>
-                <td>{transporte.nombre}</td>
-                <td>{transporte.gpsId ? transporte.gpsId : 'Sin GPS'}</td>
-                <td>
-                  {/* Renderizar las paradas relacionadas */}
-                  {transporte.paradas && transporte.paradas.length > 0 ? (
-                    <ul>
-                      {transporte.paradas.map((p, index) => (
-                        <li key={p.parada?._id || index}>{p.parada?.nombre || ""}</li>
-                      ))}
-                    </ul>
-                  ) : (
-                    'Sin paradas'
-                  )}
-                </td>
-                <td>
-                  <Link to={`/admin/editar-transporte/${transporte._id}`}>
-                    <button className="btn btn-warning">Editar</button>
-                  </Link>
-                  {' '}
-                  <button
-                    className="btn btn-danger"
-                    onClick={() => deleteTransporte(transporte._id)}
-                  >
-                    Eliminar
-                  </button>
-                </td>
+        <div className="table-responsive">
+          <table className="table table-striped table-hover">
+            <thead className="table-dark">
+              <tr>
+                <th>Nombre</th>
+                <th>GPS Relacionado</th>
+                <th>Acciones</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {transportes.map((transporte) => (
+                <tr key={transporte._id}>
+                  <td>{transporte.nombre}</td>
+                  <td>{transporte.gpsId ? transporte.gpsId : 'Sin GPS'}</td>
+                  <td>
+                    <div className="d-flex gap-2">
+                      <Link to={`/admin/editar-transporte/${transporte._id}`}>
+                        <button className="btn btn-warning btn-sm">Editar</button>
+                      </Link>
+                      <button
+                        className="btn btn-danger btn-sm"
+                        onClick={() => deleteTransporte(transporte._id)}
+                      >
+                        Eliminar
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
+    <Footer />
+  </>
   );
 };

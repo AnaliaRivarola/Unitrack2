@@ -57,7 +57,8 @@ exports.createTransporte = async (req, res) => {
 // Obtener todos los transportes con las paradas pobladas
 exports.getAllTransportes = async (req, res) => {
   try {
-    const transportes = await Transporte.find().populate('paradas.parada'); // Poblar las paradas relacionadas
+    const transportes = await Transporte.find()
+
     res.status(200).json(transportes);
   } catch (error) {
     console.error("Error al obtener los transportes:", error);

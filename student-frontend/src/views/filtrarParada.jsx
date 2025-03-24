@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import "../styles/filtrarParada.css";
+import { Navbar } from 'shared-frontend/components/Navbar';
+import { Footer } from 'shared-frontend/components/Footer';
 import { Container, Row, Col, Form, InputGroup, ListGroup, Alert } from 'react-bootstrap';
 
 function FiltrarParada() {
@@ -46,6 +48,8 @@ function FiltrarParada() {
   };
 
   return (
+    <>
+    <Navbar logoSrc="../src/assets/logoLetra.png" altText="Logo" />
     <Container className="mt-4">
       {/* Mensaje de error */}
       {error && <Alert variant="danger">{error}</Alert>}
@@ -92,6 +96,8 @@ function FiltrarParada() {
         </Col>
       </Row>
     </Container>
+    <Footer />
+    </>
   );
 }
 

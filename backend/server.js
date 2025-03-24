@@ -32,6 +32,8 @@ const generarHash = async (password) => {
   console.log("Contraseña encriptada:", hashedPassword);
 };
 
+const contactoRoutes = require("./routes/contactoRoutes");
+
 // Reemplaza '123456' con la contraseña que quieres usar
 generarHash('123456');
 // =============================
@@ -72,6 +74,7 @@ app.use('/api/horarios', horarioRoutes); // Rutas de horarios
 app.use('/api', usuariosRoutes);
 app.use('/api/gps', gpsRoutes); // Registra las rutas bajo el prefijo /api/gps
 app.use('/api', gpsRoutes); // Registra las rutas bajo el prefijo /api
+app.use("/api", contactoRoutes);
 
 
 app.use('/api/protected-route', authenticateJWT, (req, res) => {
@@ -128,6 +131,7 @@ io.on("connection", (socket) => {
     io.emit("ubicacionEstudiante", data); // Reenviar a todos los conductores
   });
 
+
   // Escuchar cuando el chofer confirma que esperará al estudiante
   socket.on("choferEsperara", (data) => {
     console.log("🟢 Chofer esperará al estudiante en:", data);
@@ -145,7 +149,6 @@ io.on("connection", (socket) => {
     console.log("🔴 Chofer no esperará al estudiante en:", data);
     io.emit("choferNoEsperara", data); // Enviar evento a los estudiantes
   });
-
   // Manejo de desconexión
   socket.on("disconnect", () => {
     console.log("❌ Cliente desconectado:", socket.id);

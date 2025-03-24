@@ -4,38 +4,43 @@
 }
 
 .navbar {
-  display: fixed;
-  justify-content: center;
-  align-items: center;
-  height: 60px;
-  background-color: #A0D4DF;
+  display: flex; /* Cambiado a flex para centrar el contenido */
+  justify-content: center; /* Centra horizontalmente el contenido */
+  align-items: center; /* Centra verticalmente el contenido */
+  height: 80px; /* Altura del Navbar */
+  background-color: #A0D4DF; /* Color de fondo */
   color: white;
-  padding: 0 20px;
+  padding: 0; /* Elimina cualquier padding adicional */
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  margin-bottom:100px;
 }
 
 /* Contenedor del logo */
 .navbar-logo-container {
   display: flex;
-  justify-content: center;
-  align-items: center;
+  justify-content: center; /* Centra horizontalmente */
+  align-items: center; /* Centra verticalmente */
+  width: 100%; /* Asegura que ocupe todo el ancho del Navbar */
+  height: 100%; /* Asegura que ocupe toda la altura del Navbar */
+  margin: 0;
+  padding: 0;
 }
 
 /* Logo de la barra de navegación */
 .navbar-logo {
   max-height: 40px; /* Ajusta el tamaño de la imagen */
   max-width: 100%;
+  float: none; /* Asegúrate de que no esté flotando */
+  margin: 0 auto; /* Centra el logo si hay algún margen heredado */
 }
 
 /* Media query para pantallas pequeñas (móviles) */
 @media (max-width: 768px) {
   .navbar {
     padding: 0 10px; /* Menos espacio en los lados para móviles */
-    height: 50px; /* Ajusta la altura en móviles */
+    height: 70px; /* Ajusta la altura en móviles */
   }
 
   .navbar-logo {
