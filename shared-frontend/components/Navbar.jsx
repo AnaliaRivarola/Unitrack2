@@ -1,5 +1,4 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import "../styles/Navbar.css";
 
 export const Navbar = ({ logoSrc, altText }) => {
@@ -13,14 +12,6 @@ export const Navbar = ({ logoSrc, altText }) => {
     <div>
       <nav className="navbar">
         {/* Flecha para regresar */}
-        <button
-          className="navbar-back-button"
-          onClick={handleBack}
-        >
-          ←
-        </button>
-
-        {/* Logo */}
         <div className="navbar-logo-container">
           <img src={logoSrc} alt={altText} className="navbar-logo" />
         </div>
