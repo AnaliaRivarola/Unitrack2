@@ -34,6 +34,10 @@ const generarHash = async (password) => {
 
 const contactoRoutes = require("./routes/contactoRoutes");
 
+app.get('/test', (req, res) => {
+  res.json({ message: 'Backend funcionando en Vercel' });
+});
+
 // Reemplaza '123456' con la contraseña que quieres usar
 generarHash('123456');
 // =============================
