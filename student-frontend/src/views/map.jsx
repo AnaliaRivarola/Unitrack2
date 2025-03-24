@@ -17,7 +17,9 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 
 
-const socket = io("https://unitrack2.onrender.com");
+const socket = io("https://unitrack2.onrender.com", {
+  transports: ["websocket"], // Fuerza el uso de WebSockets
+});
 
 const busIcon = L.icon({
   iconUrl: markerIcon,
@@ -272,14 +274,12 @@ export const MapView = () => {
           </Marker>
         ))}
       </MapContainer>
-
-      <button 
-        onClick={handleSendLocation} 
-        className="floating-button" 
-        disabled={!isButtonEnabled}
-      >
-        Enviar mi ubicación
-      </button>
+                <button 
+          onClick={handleSendLocation} 
+          className="floating-button"
+        >
+          Enviar mi ubicación
+        </button>
 
       <Footer />
     </div>
