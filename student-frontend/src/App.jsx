@@ -18,7 +18,7 @@ function App() {
   const [count, setCount] = useState(0);
 
   useEffect(() => {
-    axios.get('http://localhost:5000/Unitrack') // Cambia esto si tu ruta de API es diferente
+    axios.get('https://unitrack2.onrender.com/Unitruck') // Cambia esto si tu ruta de API es diferente
       .then(response => {
         console.log('Datos obtenidos:', response.data);
       })

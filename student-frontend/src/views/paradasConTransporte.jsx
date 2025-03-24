@@ -17,7 +17,7 @@ const ParadasConTransporte = () => {
         setError(null);
 
         // Llamada a la API para obtener las paradas con transportes vinculados
-        const response = await axios.get('http://localhost:5000/api/paradas-con-transportes');
+        const response = await axios.get('https://unitrack2.onrender.com/api/paradas-con-transportes');
         setParadas(response.data); // Guardamos los datos en el estado
         setLoading(false);
       } catch (err) {

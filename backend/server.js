@@ -52,6 +52,7 @@ app.use(express.json()); // Permite leer JSON en las peticiones
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
+  serverSelectionTimeoutMS: 30000,
 }).then(() => {
   console.log("✅ Conectado a MongoDB");
 }).catch((error) => {

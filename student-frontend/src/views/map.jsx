@@ -17,7 +17,7 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 
 
-const socket = io("http://localhost:5000");
+const socket = io("https://unitrack2.onrender.com");
 
 const busIcon = L.icon({
   iconUrl: markerIcon,
@@ -100,7 +100,7 @@ export const MapView = () => {
   useEffect(() => {
     const fetchStops = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/paradas");
+        const response = await axios.get("https://unitrack2.onrender.com/api/paradas");
         setStops(response.data);
       } catch (error) {
         console.error("Error al obtener las paradas:", error);

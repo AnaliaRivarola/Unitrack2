@@ -15,7 +15,7 @@ function FiltrarParada() {
 
   // Obtener paradas desde la API
   useEffect(() => {
-    axios.get('http://localhost:5000/api/paradas')
+    axios.get('https://unitrack2.onrender.com/api/paradas')
       .then(response => {
         setParadas(response.data);
         setFilteredParadas(response.data);

@@ -21,7 +21,7 @@ export const Contacto = () => {
     e.preventDefault();
     try {
       // Enviar los datos al backend
-      await axios.post("http://localhost:5000/api/contacto", formData);
+      await axios.post("https://unitrack2.onrender.com/api/contacto", formData);
       setEnviado(true);
       setFormData({ nombre: "", correo: "", mensaje: "" }); // Limpiar el formulario
     } catch (error) {
