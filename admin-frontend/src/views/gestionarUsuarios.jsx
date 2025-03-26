@@ -10,25 +10,36 @@ export const GestionarUsuarios = () => {
   const [usuarioAutenticado, setUsuarioAutenticado] = useState(null);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    const fetchUsuarios = async () => {
-      try {
-        const token = localStorage.getItem('token'); // Obtén el token del almacenamiento local
-        const response = await axios.get('http://localhost:5000/api/auth/usuarios', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+  const fetchUsuarios = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get('http://localhost:5000/api/auth/usuarios', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-        if (response.data.success) {
-          setUsuarios(response.data.usuarios);
-        }
-      } catch (error) {
-        console.error('Error al obtener usuarios:', error);
-        setError('No se pudieron cargar los usuarios. Intenta nuevamente.');
+      // Asegúrate de que la propiedad "usuarios" sea un array antes de actualizar el estado
+      if (Array.isArray(response.data.usuarios)) {
+        setUsuarios(response.data.usuarios);
+      } else {
+        console.error('La propiedad "usuarios" de la API no es un array:', response.data.usuarios);
+        setUsuarios([]); // Establece un array vacío si la respuesta no es válida
       }
-    };
+    } catch (error) {
+      if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+        alert('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
+        localStorage.removeItem('token');
+        window.location.href = '/login';
+      } else {
+        setError('Error al obtener usuarios. Intenta nuevamente más tarde.');
+        console.error('Error al obtener usuarios:', error);
+      }
+    }
+  };
 
+  useEffect(() => {
+    fetchUsuarios();
     const fetchUsuarioAutenticado = async () => {
       try {
         const token = localStorage.getItem('token');
@@ -44,7 +55,6 @@ export const GestionarUsuarios = () => {
       }
     };
 
-    fetchUsuarios();
     fetchUsuarioAutenticado();
   }, []);
 
@@ -88,20 +98,21 @@ export const GestionarUsuarios = () => {
             </tr>
           </thead>
           <tbody>
-            {usuarios
-              .filter((usuario) => usuario._id !== usuarioAutenticado?._id) // Filtrar al usuario autenticado (admin)
-              .map((usuario) => (
-                <tr key={usuario._id}>
-                  <td>{usuario.nombre}</td>
-                  <td>{usuario.email}</td>
-                  <td id="acciones">
-                    <Link to={`/admin/usuarios/${usuario._id}/editar`}>
-                      <button>Editar</button>
-                    </Link>
-                    <button onClick={() => handleDelete(usuario._id)}>Eliminar</button>
-                  </td>
-                </tr>
-              ))}
+            {Array.isArray(usuarios) &&
+              usuarios
+                .filter((usuario) => usuario._id !== usuarioAutenticado?._id) // Filtrar al usuario autenticado (admin)
+                .map((usuario) => (
+                  <tr key={usuario._id}>
+                    <td>{usuario.nombre}</td>
+                    <td>{usuario.email}</td>
+                    <td id="acciones">
+                      <Link to={`/admin/usuarios/${usuario._id}/editar`}>
+                        <button>Editar</button>
+                      </Link>
+                      <button onClick={() => handleDelete(usuario._id)}>Eliminar</button>
+                    </td>
+                  </tr>
+                ))}
           </tbody>
         </table>
         <Footer />

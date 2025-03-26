@@ -8,7 +8,7 @@ const HorariosDisponibles = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("https://unitrack2.onrender.com/api/horarios") // Ajusta la URL según tu backend
+    fetch("http://localhost:5000/api/horarios") // Ajusta la URL según tu backend
       .then((response) => response.json())
       .then((data) => {
         setHorarios(data);

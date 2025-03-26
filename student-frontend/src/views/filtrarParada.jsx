@@ -11,11 +11,12 @@ function FiltrarParada() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredParadas, setFilteredParadas] = useState([]);
   const [error, setError] = useState(null);
+  const [selectedParadaId, setSelectedParadaId] = useState(null);
   const navigate = useNavigate();
 
   // Obtener paradas desde la API
   useEffect(() => {
-    axios.get('https://unitrack2.onrender.com/api/paradas')
+    axios.get('http://localhost:5000/api/paradas')
       .then(response => {
         setParadas(response.data);
         setFilteredParadas(response.data);
@@ -44,6 +45,7 @@ function FiltrarParada() {
 
   // Redirigir a la vista de seleccionar transporte
   const handleParadaSelect = (paradaId) => {
+    setSelectedParadaId(paradaId); // Actualiza el estado con la parada seleccionada
     navigate(`/seleccionarTransporte/${paradaId}`);
   };
 

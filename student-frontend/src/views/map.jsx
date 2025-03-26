@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef, useMemo } from "react";
 import { Navbar } from 'shared-frontend/components/Navbar';
 import { Footer } from 'shared-frontend/components/Footer';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, useMap, Circle } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import io from "socket.io-client";
 import L from "leaflet";
@@ -15,9 +15,9 @@ import Sidebar from "./sideBar";
 import '../styles/mapa.css';  
 import axios from "axios";  
 import { useParams } from "react-router-dom";
+import throttle from "lodash.throttle";
 
-
-const socket = io("https://unitrack2.onrender.com", {
+const socket = io("http://localhost:5000", {
   transports: ["websocket"], // Fuerza el uso de WebSockets
 });
 
@@ -80,6 +80,7 @@ export const MapView = () => {
   const [studentLocation, setStudentLocation] = useState(null);
   const [stops, setStops] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [accuracy, setAccuracy] = useState(0); // Estado para la precisión
 
   // 📌 Estado para manejar el mensaje recibido del chofer
   const [mensajeChofer, setMensajeChofer] = useState("");
@@ -87,6 +88,7 @@ export const MapView = () => {
   
   // Eliminamos el estado y la lógica de `selectedTransporte`
   const [isButtonEnabled, setIsButtonEnabled] = useState(false);
+  const markerRef = useRef(null); // Ref para el marcador
 
   useEffect(() => {
     socket.on("choferEsperara", () => {
@@ -132,13 +134,19 @@ export const MapView = () => {
   
       if (typeof data.latitud === "number" && typeof data.longitud === "number") {
         console.log("✅ Actualizando ubicación del transporte...");
-        setPosition({
+        const newPosition = {
           lat: data.latitud,
           lng: data.longitud,
           nombreTransporte: data.nombreTransporte || "Sin nombre", // Incluye el nombre del transporte
-        });
+        };
+        setPosition(newPosition);
         setNoData(false);
         setLastUpdate(Date.now());
+
+        // Actualiza directamente la posición del marcador
+        if (markerRef.current) {
+          markerRef.current.setLatLng(newPosition);
+        }
       } else {
         console.error("⚠️ Datos de ubicación incompletos o inválidos:", data);
       }
@@ -162,6 +170,20 @@ export const MapView = () => {
   
     return () => {
       socket.off("mensaje-estudiante");
+    };
+  }, []);
+
+  useEffect(() => {
+    const updatePosition = throttle((data) => {
+      if (data && typeof data.latitud === "number" && typeof data.longitud === "number") {
+        setPosition({ lat: data.latitud, lng: data.longitud });
+      }
+    }, 1000); // Actualiza como máximo una vez por segundo
+  
+    socket.on("ubicacionActualizada", updatePosition);
+  
+    return () => {
+      socket.off("ubicacionActualizada", updatePosition);
     };
   }, []);
 
@@ -199,6 +221,7 @@ export const MapView = () => {
           console.log(`Ubicación obtenida: Latitud: ${latitude}, Longitud: ${longitude}, Precisión: ${accuracy} metros`);
           setStudentLocation({ lat: latitude, lng: longitude });
           setPosition({ lat: latitude, lng: longitude });
+          setAccuracy(accuracy); // Guarda la precisión en el estado
         },
         (err) => {
           console.error("No se pudo obtener la ubicación", err);
@@ -234,6 +257,14 @@ export const MapView = () => {
     }
   }, [studentLocation, position]);
 
+  const stopMarkers = useMemo(() => {
+    return stops.map((stop) => (
+      <Marker key={stop._id} position={[stop.ubicacion.latitud, stop.ubicacion.longitud]} icon={stopIcon}>
+        <Popup>Nombre: {stop.nombre}</Popup>
+      </Marker>
+    ));
+  }, [stops]);
+
   return (
     <>
      <Navbar logoSrc="../src/assets/logoLetra.png" altText="Logo" />
@@ -254,25 +285,25 @@ export const MapView = () => {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
-        <Marker position={position} icon={busIcon}>
-        <Popup>
-          {noData
-            ? "⚠️ Sin actualización de ubicación"
-            : `🚍  Nombre del Transporte: ${position.nombreTransporte}`}
-        </Popup>
-      </Marker>
+        <Marker position={position} icon={busIcon} ref={markerRef}>
+          <Popup>
+            {noData
+              ? "⚠️ Sin actualización de ubicación"
+              : `🚍  Nombre del Transporte: ${position.nombreTransporte}`}
+          </Popup>
+        </Marker>
+
 
         {studentLocation && (
+          <>
           <Marker position={studentLocation} icon={studentLocationIcon}>
             <Popup>{"Tu estás aquí!"}</Popup>
           </Marker>
+
+          </>
         )}
 
-        {stops.map((stop) => (
-          <Marker key={stop._id} position={[stop.ubicacion.latitud, stop.ubicacion.longitud]} icon={stopIcon}>
-            <Popup>Nombre: {stop.nombre}</Popup>
-          </Marker>
-        ))}
+        {stopMarkers}
       </MapContainer>
                 <button 
           onClick={handleSendLocation} 

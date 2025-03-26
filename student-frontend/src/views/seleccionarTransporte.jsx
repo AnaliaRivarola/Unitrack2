@@ -19,7 +19,7 @@ function SeleccionarTransportes() {
         setLoading(true);
         setError(null);  // Restablecemos el error antes de hacer la solicitud
         try {
-          const response = await axios.get(`https://unitrack2.onrender.com//api/transportes?paradaId=${paradaId}`);
+          const response = await axios.get(`http://localhost:5000/api/transportes?paradaId=${paradaId}`);
           setTransportes(response.data);  // Guardamos los transportes obtenidos
           setLoading(false);  // Terminamos de cargar
         } catch (error) {

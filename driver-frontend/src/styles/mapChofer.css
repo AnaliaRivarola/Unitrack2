@@ -1,7 +1,7 @@
 .floating-button {
     position: absolute;
-    bottom: 80px; /* Ajusta este valor según la altura del footer */
     left: 50%;
+    bottom: -70px;
     transform: translateX(-50%);
     z-index: 1000; /* Asegúrate de que el botón esté por encima del mapa */
     padding: 10px 20px;
@@ -21,6 +21,6 @@
   
   @media (max-width: 768px) {
     .floating-button {
-        bottom: 120px; /* Mueve el botón más arriba en dispositivos móviles */
+        bottom: -50px; /* Mueve el botón más arriba en dispositivos móviles */
     }
 }

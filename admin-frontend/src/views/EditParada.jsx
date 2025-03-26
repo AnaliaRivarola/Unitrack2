@@ -83,7 +83,6 @@ export const EditParada = () => {
         },
       });
       console.log('Parada actualizada:', response.data);
-      alert('Parada actualizada correctamente');
       navigate('/admin/gestionar-paradas'); // Redirige después de actualizar
     } catch (error) {
       console.error('Error al actualizar la parada:', error.response?.data || error.message);
