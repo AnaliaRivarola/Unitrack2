@@ -1,5 +1,5 @@
 // src/pages/Login.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -9,6 +9,17 @@ const Login = () => {
   const [contraseña, setContraseña] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
+
+  // Verificar si el usuario ya está autenticado
+  useEffect(() => {
+    const token = localStorage.getItem('driver_token');
+    const rol = localStorage.getItem('driver_rol');
+
+    if (token && rol === 'chofer') {
+      console.log("Usuario ya autenticado, redirigiendo al mapa del chofer...");
+      navigate('/chofer/mapa'); // Redirige al mapa del chofer si ya está autenticado
+    }
+  }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -29,6 +40,7 @@ const Login = () => {
       if (rol === 'chofer') {
         localStorage.setItem('driver_token', token); // Guarda el token con una clave específica para el chofer
         localStorage.setItem('driver_rol', rol); // Guarda el rol del usuario
+        console.log("Token almacenado en localStorage:", localStorage.getItem('driver_token')); // Verifica que se almacene correctamente
         navigate('/chofer/mapa'); // Redirigir al mapa del chofer
       } else {
         setError('Credenciales incorrectas'); // Mostrar error si el rol no es "chofer"

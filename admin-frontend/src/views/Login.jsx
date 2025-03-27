@@ -1,5 +1,5 @@
 // src/pages/Login.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -9,6 +9,17 @@ const Login = () => {
   const [contraseña, setContraseña] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
+
+  // Verificar si el usuario ya está autenticado
+  useEffect(() => {
+    const token = localStorage.getItem('admin_token');
+    const rol = localStorage.getItem('admin_rol');
+
+    if (token && rol === 'admin') {
+      console.log("Usuario ya autenticado, redirigiendo al dashboard...");
+      navigate('/admin/dashboard'); // Redirige al dashboard si ya está autenticado
+    }
+  }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -24,13 +35,12 @@ const Login = () => {
 
       console.log("Token recibido:", token);
       console.log("Rol recibido:", rol);
-      console.log("Token almacenado en localStorage:", localStorage.getItem('admin_token'));
-
 
       // Verificar si el rol es "admin"
       if (rol === 'admin') {
-        localStorage.setItem('admin_token', token); // Guarda el token con una clave específica para el administrador
-        localStorage.setItem('admin_rol', rol); // Guarda el rol del usuario
+        localStorage.setItem('admin_token', token); // Guarda el token
+        localStorage.setItem('admin_rol', rol); // Guarda el rol
+        console.log("Token almacenado en localStorage:", localStorage.getItem('admin_token')); // Verifica que se almacene correctamente
         navigate('/admin/dashboard'); // Redirigir al dashboard del administrador
       } else {
         setError('Credenciales incorrectas'); // Mostrar error si el rol no es "admin"

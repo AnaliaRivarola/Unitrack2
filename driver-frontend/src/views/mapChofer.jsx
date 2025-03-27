@@ -81,8 +81,11 @@ export const MapView = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('driver_token');
     localStorage.removeItem('driver_rol');
+    localStorage.removeItem('driver_token');
+    localStorage.removeItem('rol');
+    localStorage.removeItem('token');
+    
     navigate('/login');
   };
 

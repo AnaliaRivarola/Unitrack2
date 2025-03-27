@@ -10,7 +10,9 @@ export const AdminDashboard = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('admin_token');
+    localStorage.removeItem('admin_rol');
     localStorage.removeItem('rol');
+    localStorage.removeItem('token');
     navigate('/login');
   };
 
