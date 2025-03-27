@@ -95,7 +95,7 @@ const iniciarConsultaPeriodica = (io) => {
     } catch (error) {
       console.error('Error en la consulta periódica:', error);
     }
-  }, 5000); // Consulta cada 5 segundos
+  }, 1000); // Consulta cada 5 segundos
 };
 
 module.exports = {

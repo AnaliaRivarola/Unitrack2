@@ -22,16 +22,16 @@ import 'react-toastify/dist/ReactToastify.css';
 
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('token'));
+  const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('admin_token'));
   const [errorMessage, setErrorMessage] = useState(null); // Estado para el mensaje de error
 
   useEffect(() => {
     const handleStorageChange = () => {
-      setIsAuthenticated(!!localStorage.getItem('token'));
+      setIsAuthenticated(!!localStorage.getItem('admin_token'));
     };
-
+  
     window.addEventListener('storage', handleStorageChange);
-
+  
     return () => {
       window.removeEventListener('storage', handleStorageChange);
     };

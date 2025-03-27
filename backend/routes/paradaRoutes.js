@@ -7,7 +7,8 @@ const Parada = require('../models/parada.models');
 const Transporte = require('../models/transporte.models');
 
 // Ruta para obtener todas las paradas
-router.get('/paradas', ParadaController.getParadas);
+// Ruta para obtener todas las paradas
+router.get('/paradas', ParadaController.getParadasEstudiantes);
 
 // Ruta para crear una parada
 router.post('/paradas', authenticateJWT, ParadaController.createParada);
@@ -56,4 +57,7 @@ router.get('/paradas-con-transportes', async (req, res) => {
     res.status(500).json({ error: 'Error al obtener paradas con transportes' });
   }
 });
+
+// Ruta para obtener paradas asociadas al transporte del chofer (requiere autenticación)
+router.get('/chofer/paradas', authenticateJWT, ParadaController.getParadasChofer);
 module.exports = router;

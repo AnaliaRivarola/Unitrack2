@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom'; // Importa useNavigate
 import '../styles/CreateUser.css';
+import { Navbar } from 'shared-frontend/components/Navbar';
+import { Footer } from 'shared-frontend/components/Footer';
 
 export const CreateUser = () => {
   const [nombre, setNombre] = useState('');
@@ -16,7 +18,7 @@ export const CreateUser = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem('token'); // Obtén el token del almacenamiento local
+      const token = localStorage.getItem('admin_token'); // Obtén el token del almacenamiento local
       const response = await axios.post(
         'http://localhost:5000/api/auth/usuarios',
         {
@@ -48,6 +50,8 @@ export const CreateUser = () => {
   };
 
   return (
+    <>
+     <Navbar logoSrc="../src/assets/logoLetra.png" altText="Logo" />
     <div className="create-user-container">
       <h1>Crear Usuario</h1>
       <form onSubmit={handleSubmit}>
@@ -117,5 +121,7 @@ export const CreateUser = () => {
         <button type="submit">Crear Usuario</button>
       </form>
     </div>
+    <Footer />
+    </>
   );
 };

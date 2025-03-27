@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom'; // Para obtener el id de la URL y redirigir después
 import '../styles/CrearHorario.css';
 import axios from 'axios';
+import { Navbar } from 'shared-frontend/components/Navbar';
+import { Footer } from 'shared-frontend/components/Footer';
 
 export const EditarHorario = () => {
   const [transportes, setTransportes] = useState([]); // Lista de transportes
@@ -66,6 +68,8 @@ export const EditarHorario = () => {
   
 
   return (
+    <>
+    <Navbar logoSrc="../src/assets/logoLetra.png" altText="Logo" />
     <div id="crear-horario-container">
       <h2 id="crear-horario-title">Editar Horario</h2>
       <form id="crear-horario-form" onSubmit={handleSubmit}>
@@ -130,5 +134,7 @@ export const EditarHorario = () => {
         <button type="submit" id="crear-horario-btn">Editar Horario</button>
       </form>
     </div>
+    <Footer />
+    </>
   );
 };

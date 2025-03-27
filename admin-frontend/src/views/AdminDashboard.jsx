@@ -9,7 +9,7 @@ export const AdminDashboard = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    localStorage.removeItem('admin_token');
     localStorage.removeItem('rol');
     navigate('/login');
   };

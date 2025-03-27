@@ -1,7 +1,6 @@
 .floating-button {
     position: absolute;
     left: 50%;
-    bottom: -70px;
     transform: translateX(-50%);
     z-index: 1000; /* Asegúrate de que el botón esté por encima del mapa */
     padding: 10px 20px;
@@ -12,6 +11,9 @@
     font-size: 16px;
     cursor: pointer;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);  /* Sombra */
+    bottom: 20px;
+    right: 20px;
+    width: 200px;
   }
   
   .floating-button:hover {

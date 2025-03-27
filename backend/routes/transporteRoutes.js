@@ -30,10 +30,28 @@ router.get("/transportes", async (req, res) => {
   }
 });
 
+
 // 📌 👇 Cambiamos `/:id` a `/transportes/:id` para evitar capturas incorrectas
 router.get("/transportes/:id", TransporteController.getTransporteById);
 router.put("/transportes/:id",  authenticateJWT, verifyRole(['admin', 'superadmin']), TransporteController.updateTransporte);
 router.delete("/transportes/:id",  authenticateJWT, verifyRole(['admin', 'superadmin']), TransporteController.deleteTransporte);
+
+// Verificar si un GPS ya está asociado a un transporte
+router.get('/transportes/gps/:gpsId', async (req, res) => {
+  try {
+    const { gpsId } = req.params;
+    const transporte = await Transporte.findOne({ gpsId });
+
+    if (transporte) {
+      return res.status(200).json({ transporte });
+    }
+
+    res.status(200).json({ transporte: null });
+  } catch (error) {
+    console.error('Error al verificar el GPS:', error);
+    res.status(500).json({ message: 'Error al verificar el GPS', error: error.message });
+  }
+});
 
 // Ruta para asociar un GPS a un transporte
 router.post('/asociar-gps', TransporteController.asociarGpsATransporte);

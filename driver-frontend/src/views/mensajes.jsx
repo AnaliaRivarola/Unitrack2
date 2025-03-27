@@ -3,6 +3,8 @@ import { io } from "socket.io-client";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../styles/mensajes.css";
 import { useNavigate } from "react-router-dom"; // Importa useNavigate
+import { Navbar } from 'shared-frontend/components/Navbar';
+import { Footer } from 'shared-frontend/components/Footer';
 
 const socket = io("http://localhost:5000");
 
@@ -32,6 +34,8 @@ export const MensajesRapidos = () => {
   };
 
   return (
+    <>
+       <Navbar logoSrc="../src/assets/driver2.png" altText="Logo"></Navbar>
     <div className="mensajes-container">
       <h2>Mensajes Rápidos</h2>
       {mensajeEnviado && (
@@ -53,6 +57,7 @@ export const MensajesRapidos = () => {
 
       {/* Campo para mensaje personalizado */}
       <div className="custom-message-container mt-4">
+        <label>Escribe aqui tu propio mensaje</label>
         <input
           type="text"
           className="form-control"
@@ -71,5 +76,7 @@ export const MensajesRapidos = () => {
       {/* Muestra el mensaje de confirmación */}
      
     </div>
+    <Footer />
+    </>
   );
 };

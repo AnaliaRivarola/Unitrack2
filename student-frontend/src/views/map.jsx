@@ -74,7 +74,12 @@ const haversineDistance = (coords1, coords2) => {
 };
 
 export const MapView = () => {
-  const [position, setPosition] = useState({ lat: -27.333, lng: -55.866, nombreTransporte: "" });
+    const [position, setPosition] = useState({
+    lat: null,
+    lng: null,
+    nombreTransporte: "",
+    transporteDisponible: false, // Indica si hay un transporte disponible
+  });
   const [noData, setNoData] = useState(false);
   const [lastUpdate, setLastUpdate] = useState(Date.now());
   const [studentLocation, setStudentLocation] = useState(null);
@@ -121,34 +126,33 @@ export const MapView = () => {
       }
     }, 10000); // Se ejecuta cada 10 segundos
   
-    socket.on("ubicacionActualizada", (data) => {
+         socket.on("ubicacionActualizada", (data) => {
       console.log("📍 Nueva ubicación recibida:", data);
-  
-      if (!data) {
-        console.error("❌ Error: No se recibió ningún dato en 'ubicacionActualizada'.");
-        return;
-      }
-  
-      console.log("🔍 Claves disponibles en data:", Object.keys(data));
-
-  
-      if (typeof data.latitud === "number" && typeof data.longitud === "number") {
+    
+      if (
+        data &&
+        typeof data.latitud === "number" &&
+        typeof data.longitud === "number" &&
+        data.nombreTransporte // Verifica que el transporte tenga un nombre
+      ) {
         console.log("✅ Actualizando ubicación del transporte...");
         const newPosition = {
           lat: data.latitud,
           lng: data.longitud,
-          nombreTransporte: data.nombreTransporte || "Sin nombre", // Incluye el nombre del transporte
+          nombreTransporte: data.nombreTransporte,
+          transporteDisponible: true, // Indica que hay un transporte disponible
         };
         setPosition(newPosition);
         setNoData(false);
         setLastUpdate(Date.now());
-
+    
         // Actualiza directamente la posición del marcador
         if (markerRef.current) {
           markerRef.current.setLatLng(newPosition);
         }
       } else {
-        console.error("⚠️ Datos de ubicación incompletos o inválidos:", data);
+        console.error("⚠️ Datos de transporte incompletos o inválidos:", data);
+        setPosition({ lat: null, lng: null, nombreTransporte: "", transporteDisponible: false }); // No hay transporte disponible
       }
     });
   
@@ -285,13 +289,15 @@ export const MapView = () => {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
-        <Marker position={position} icon={busIcon} ref={markerRef}>
-          <Popup>
-            {noData
-              ? "⚠️ Sin actualización de ubicación"
-              : `🚍  Nombre del Transporte: ${position.nombreTransporte}`}
-          </Popup>
-        </Marker>
+                {position.transporteDisponible && (
+          <Marker position={position} icon={busIcon} ref={markerRef}>
+            <Popup>
+              {noData
+                ? "⚠️ Sin actualización de ubicación"
+                : `🚍  Nombre del Transporte: ${position.nombreTransporte}`}
+            </Popup>
+          </Marker>
+        )}
 
 
         {studentLocation && (

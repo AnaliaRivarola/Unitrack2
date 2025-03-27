@@ -4,6 +4,8 @@ import axios from 'axios';
 import L from 'leaflet'; // Asegúrate de importar Leaflet para el mapa
 import '../styles/CrearParada.css'; // Asegúrate de que los estilos sean los mismos
 import "leaflet/dist/leaflet.css";
+import { Navbar } from 'shared-frontend/components/Navbar';
+import { Footer } from 'shared-frontend/components/Footer';
 
 export const EditParada = () => {
   const { id } = useParams(); // Obtener el id de la parada desde la URL
@@ -76,7 +78,7 @@ export const EditParada = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem('token'); // Obtén el token del almacenamiento local
+      const token = localStorage.getItem('admin_token'); // Obtén el token del almacenamiento local
       const response = await axios.put(`http://localhost:5000/api/paradas/${id}`, formData, {
         headers: {
           Authorization: `Bearer ${token}`, // Incluye el token en el encabezado
@@ -91,6 +93,8 @@ export const EditParada = () => {
   };
 
   return (
+    <>
+    <Navbar logoSrc="../src/assets/logoLetra.png" altText="Logo" />
     <div className="crear-parada-container">
       <h1>Editar Parada</h1>
       <form onSubmit={handleSubmit} className="crear-parada-form">
@@ -139,5 +143,7 @@ export const EditParada = () => {
 
       {message && <p className="message">{message}</p>}
     </div>
+    <Footer />
+    </>
   );
 };

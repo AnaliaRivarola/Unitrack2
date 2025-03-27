@@ -11,7 +11,7 @@ export const Welcome = () => {
         src={welcomeImage} 
         alt="Bienvenido" 
         className="img-fluid mb-4" 
-        style={{ maxWidth: '300px' }} 
+        style={{ maxWidth: '200px' }} 
       />
       <h1 className="mb-3">¡Bienvenido a UniTrack!</h1>
       <p className="lead mb-4">

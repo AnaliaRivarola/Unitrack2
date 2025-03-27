@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/CrearHorario.css';
 import axios from 'axios';
+import { Navbar } from 'shared-frontend/components/Navbar';
+import { Footer } from 'shared-frontend/components/Footer';
 
 export const CrearHorario = () => {
   const [transportes, setTransportes] = useState([]); // Lista de transportes
@@ -53,6 +55,8 @@ export const CrearHorario = () => {
   };
 
   return (
+    <>
+    <Navbar logoSrc="../src/assets/logoLetra.png" altText="Logo" />
     <div id="crear-horario-container">
       <h2 id="crear-horario-title">Crear Horario</h2>
       <form id="crear-horario-form" onSubmit={handleSubmit}>
@@ -117,5 +121,7 @@ export const CrearHorario = () => {
         <button type="submit" id="crear-horario-btn">Crear Horario</button>
       </form>
     </div>
+    <Footer />
+    </>
   );
 };

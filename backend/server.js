@@ -81,7 +81,6 @@ app.use('/api/gps', gpsRoutes); // Registra las rutas bajo el prefijo /api/gps
 app.use('/api', gpsRoutes); // Registra las rutas bajo el prefijo /api
 app.use("/api", contactoRoutes);
 
-
 app.use('/api/protected-route', authenticateJWT, (req, res) => {
   res.json({ message: 'Ruta protegida' });
 });
@@ -92,26 +91,46 @@ const login = async (req, res) => {
   const { email, contraseña } = req.body;
 
   try {
+    console.log("Datos recibidos en el backend:", req.body);
+
+    // Busca al usuario en la base de datos
     const usuario = await User.findOne({ email });
     if (!usuario) {
       return res.status(400).json({ mensaje: "Usuario no encontrado" });
     }
 
-    const esValida = await usuario.compararContraseña(contraseña);
+    console.log("Usuario encontrado en la base de datos:", usuario);
+
+    // Verifica la contraseña
+    const esValida = await bcrypt.compare(contraseña, usuario.contraseña);
     if (!esValida) {
       return res.status(400).json({ mensaje: "Contraseña incorrecta" });
     }
 
+    // Verifica si el usuario está activo
+    if (!usuario.estado) {
+      return res.status(403).json({ mensaje: "Usuario inactivo" });
+    }
+
+    // Genera el token JWT
     const token = jwt.sign(
-      { id: usuario._id, rol: usuario.rol }, // El rol sí se incluye en el token
+      {
+        id: usuario._id,
+        rol: usuario.rol,
+      },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
 
-    // 🔹 Ahora enviamos el rol también en la respuesta
-    res.json({ token, rol: usuario.rol });
+    console.log("Token generado:", token);
 
+    // Devuelve el token y el rol en la respuesta
+    res.json({
+      token,
+      rol: usuario.rol,
+    });
   } catch (error) {
+    console.error("Error en el login:", error);
     res.status(500).json({ mensaje: "Error al procesar la solicitud", error: error.message });
   }
 };

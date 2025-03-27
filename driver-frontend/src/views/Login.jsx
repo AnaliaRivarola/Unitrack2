@@ -12,37 +12,30 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+    setError(''); // Limpiar el mensaje de error antes de intentar iniciar sesión
+
     try {
       const response = await axios.post('http://localhost:5000/api/auth/login', {
         email: email.trim(),
         contraseña,
       });
-  
+
       const { token, rol } = response.data;
-      
+
       console.log("Token recibido:", token);
       console.log("Rol recibido:", rol);
-  
-      localStorage.setItem('token', token);
-      localStorage.setItem('rol', rol);
-  
-      // Definir las URLs de cada aplicación
-      const adminURL = 'http://localhost:5174';
-      const driverURL = 'http://localhost:5173';
 
-      // Redirigir a la app correspondiente
-      if (rol === 'admin') {
-        window.location.href = `${adminURL}/admin/dashboard`;
-      } else if (rol === 'chofer') {
-        window.location.href = `${driverURL}/chofer/mapa`;
+      // Verificar si el rol es "chofer"
+      if (rol === 'chofer') {
+        localStorage.setItem('driver_token', token); // Guarda el token con una clave específica para el chofer
+        localStorage.setItem('driver_rol', rol); // Guarda el rol del usuario
+        navigate('/chofer/mapa'); // Redirigir al mapa del chofer
       } else {
-        setError('Rol no válido');
+        setError('Credenciales incorrectas'); // Mostrar error si el rol no es "chofer"
       }
-  
     } catch (error) {
       console.error("Error en el login:", error);
-      setError(`Error: ${error.response?.data?.mensaje || error.message}`);
+      setError(`Error: ${error.response?.data?.mensaje || 'Credenciales incorrectas'}`);
     }
   };
 
@@ -51,7 +44,7 @@ const Login = () => {
       <div className="card shadow-lg" style={{ maxWidth: '400px', width: '100%' }}>
         <div className="card-header text-center bg-primary text-white">
           <h3>Iniciar sesión</h3>
-          <p>Driver</p>
+          <p>Chofer</p>
         </div>
         <div className="card-body p-4">
           <form onSubmit={handleSubmit}>

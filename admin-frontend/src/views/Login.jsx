@@ -4,7 +4,6 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-
 const Login = () => {
   const [email, setEmail] = useState('');
   const [contraseña, setContraseña] = useState('');
@@ -13,37 +12,32 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+    setError(''); // Limpiar el mensaje de error antes de intentar iniciar sesión
+
     try {
       const response = await axios.post('http://localhost:5000/api/auth/login', {
         email: email.trim(),
         contraseña,
       });
-  
+
       const { token, rol } = response.data;
-      
+
       console.log("Token recibido:", token);
       console.log("Rol recibido:", rol);
-  
-      localStorage.setItem('token', token);
-      localStorage.setItem('rol', rol);
-  
-      // Definir las URLs de cada aplicación
-      const adminURL = 'http://localhost:5173';
-      const driverURL = 'http://localhost:5174';
+      console.log("Token almacenado en localStorage:", localStorage.getItem('admin_token'));
 
-      // Redirigir a la app correspondiente
+
+      // Verificar si el rol es "admin"
       if (rol === 'admin') {
-        window.location.href = `${adminURL}/admin/dashboard`;
-      } else if (rol === 'chofer') {
-        window.location.href = `${driverURL}/driver/dashboard`;
+        localStorage.setItem('admin_token', token); // Guarda el token con una clave específica para el administrador
+        localStorage.setItem('admin_rol', rol); // Guarda el rol del usuario
+        navigate('/admin/dashboard'); // Redirigir al dashboard del administrador
       } else {
-        setError('Rol no válido');
+        setError('Credenciales incorrectas'); // Mostrar error si el rol no es "admin"
       }
-  
     } catch (error) {
       console.error("Error en el login:", error);
-      setError(`Error: ${error.response?.data?.mensaje || error.message}`);
+      setError(`Error: ${error.response?.data?.mensaje || 'Credenciales incorrectas'}`);
     }
   };
 

@@ -10,15 +10,15 @@ function App() {
   const [count, setCount] = useState(0);
 
   // Verificar si hay un token en el localStorage
-  const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('token'));
+  const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('driver_token'));
 
   useEffect(() => {
     const handleStorageChange = () => {
-      setIsAuthenticated(!!localStorage.getItem('token'));
+      setIsAuthenticated(!!localStorage.getItem('driver_token'));
     };
-
+  
     window.addEventListener('storage', handleStorageChange);
-    
+  
     return () => {
       window.removeEventListener('storage', handleStorageChange);
     };

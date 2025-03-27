@@ -3,10 +3,17 @@ const jwt = require('jsonwebtoken');
 
 // Middleware para autenticar JWT
 const authenticateJWT = (req, res, next) => {
-  const token = req.headers['authorization']?.split(' ')[1];
+  const authHeader = req.headers['authorization'];
+
+  if (!authHeader) {
+    console.log('Token no proporcionado');
+    return res.status(403).json({ mensaje: 'Acceso denegado, token no proporcionado' });
+  }
+
+  const token = authHeader.split(' ')[1]; // Extrae el token después de "Bearer"
 
   if (!token) {
-    console.log('Token no proporcionado');
+    console.log('Token no proporcionado después de Bearer');
     return res.status(403).json({ mensaje: 'Acceso denegado, token no proporcionado' });
   }
 
@@ -18,16 +25,15 @@ const authenticateJWT = (req, res, next) => {
 
     console.log('Token decodificado:', decoded); // Log para verificar el contenido del token
 
-    // Asegurarse de que req.usuario tenga el campo _id
     req.usuario = {
-      ...decoded,
       _id: decoded._id || decoded.id, // Usar _id o id dependiendo de cómo esté configurado el token
+      rol: decoded.rol, // Asegurarse de incluir el rol
     };
 
+    console.log('Usuario autenticado en req.usuario:', req.usuario); // Verifica que req.usuario esté configurado
     next();
   });
 };
-
 // Middleware para verificar roles
 const verifyRole = (roles) => (req, res, next) => {
   if (!roles.includes(req.usuario.rol)) {

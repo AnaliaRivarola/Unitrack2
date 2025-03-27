@@ -4,6 +4,8 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';  // Importa useNavigate
 import '../styles/CrearParada.css';
 import "leaflet/dist/leaflet.css";
+import { Navbar } from 'shared-frontend/components/Navbar';
+import { Footer } from 'shared-frontend/components/Footer';
 
 export const CrearParada = () => {
   const [formData, setFormData] = useState({
@@ -73,7 +75,7 @@ export const CrearParada = () => {
     e.preventDefault();
     try {
       // Obtén el token desde el almacenamiento local
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('admin_token');
 
       // Configura los encabezados con el token
       const config = {
@@ -94,6 +96,8 @@ export const CrearParada = () => {
   };
 
   return (
+    <>
+    <Navbar logoSrc="../src/assets/logoLetra.png" altText="Logo" />
     <div className="crear-parada-container">
       <h1>Crear Parada</h1>
       <form onSubmit={handleSubmit} className="crear-parada-form">
@@ -142,5 +146,6 @@ export const CrearParada = () => {
 
       {message && <p className="message">{message}</p>}
     </div>
+    </>
   );
 };

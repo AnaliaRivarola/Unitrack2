@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom'; // Para obtener el ID del usuario y redirigir
 import '../styles/CreateUser.css'; // Reutilizamos los estilos de creación de usuario
+import { Navbar } from 'shared-frontend/components/Navbar';
+import { Footer } from 'shared-frontend/components/Footer';
 
 export const EditUser = () => {
   const { id } = useParams(); // Obtiene el ID del usuario desde la URL
@@ -18,7 +20,7 @@ export const EditUser = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const token = localStorage.getItem('token'); // Obtén el token del almacenamiento local
+        const token = localStorage.getItem('admin_token'); // Obtén el token del almacenamiento local
         const response = await axios.get(`http://localhost:5000/api/auth/usuarios/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`, // Incluye el token en el encabezado
@@ -42,7 +44,7 @@ export const EditUser = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem('token'); // Obtén el token del almacenamiento local
+      const token = localStorage.getItem('admin_token'); // Obtén el token del almacenamiento local
       const response = await axios.put(
         `http://localhost:5000/api/auth/usuarios/${id}`,
         {
@@ -74,6 +76,8 @@ export const EditUser = () => {
   };
 
   return (
+    <>
+    <Navbar logoSrc="../src/assets/logoLetra.png" altText="Logo" />
     <div className="create-user-container">
       <h1>Editar Usuario</h1>
       <form onSubmit={handleSubmit}>
@@ -144,5 +148,7 @@ export const EditUser = () => {
         <button type="submit">Guardar Cambios</button>
       </form>
     </div>
+    <Footer />
+    </>
   );
 };

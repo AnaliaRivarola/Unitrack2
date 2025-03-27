@@ -1,7 +1,7 @@
 // controllers/ParadaController.js
 const Parada = require('../models/parada.models');
 const Auditoria = require('../models/auditoria.models'); // Importa el modelo de auditoría
-
+const Transporte = require('../models/transporte.models');
 // Crear una nueva parada
 exports.createParada = async (req, res) => {
   const { nombre, ubicacion } = req.body;
@@ -42,14 +42,50 @@ exports.createParada = async (req, res) => {
   }
 };
 
-// Obtener todas las paradas
-exports.getParadas = async (req, res) => {
+
+// Obtener todas las paradas (para estudiantes, sin autenticación)
+exports.getParadasEstudiantes = async (req, res) => {
   try {
-    console.log('Usuario autenticado en getParadas:', req.usuario); // Log para verificar el usuario
-    const paradas = await Parada.find();
+    const paradas = await Parada.find().lean(); // Obtén todas las paradas
     res.json(paradas);
   } catch (error) {
-    console.error('Error al obtener las paradas:', error);
+    console.error('Error al obtener las paradas para estudiantes:', error);
+    res.status(500).json({ message: 'Error al obtener las paradas', error });
+  }
+};
+
+// Obtener paradas asociadas al transporte del chofer (requiere autenticación)
+exports.getParadasChofer = async (req, res) => {
+  try {
+    console.log('Usuario autenticado en getParadasChofer:', req.usuario);
+
+    if (!req.usuario) {
+      return res.status(403).json({ message: 'Usuario no autenticado' });
+    }
+
+    const choferId = req.usuario._id;
+    console.log('ID del chofer:', choferId);
+
+    const transporte = await Transporte.findOne({ id_usuario: choferId }).populate('paradas.parada');
+    console.log('Transporte después de populate:', JSON.stringify(transporte, null, 2));
+
+    if (!transporte) {
+      return res.status(404).json({ message: 'No se encontró un transporte asociado al chofer' });
+    }
+
+    const paradas = transporte.paradas
+      .filter((p) => p.parada) // Filtra las paradas que no tienen datos
+      .map((p) => ({
+        _id: p.parada._id,
+        nombre: p.parada.nombre,
+        latitud: p.parada.ubicacion.latitud,
+        longitud: p.parada.ubicacion.longitud,
+      }));
+
+    console.log('Paradas encontradas para el chofer:', paradas);
+    res.json({ paradas }); // Devuelve un objeto con la propiedad "paradas"
+  } catch (error) {
+    console.error('Error al obtener las paradas del chofer:', error);
     res.status(500).json({ message: 'Error al obtener las paradas', error });
   }
 };

@@ -11,7 +11,6 @@ function FiltrarParada() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredParadas, setFilteredParadas] = useState([]);
   const [error, setError] = useState(null);
-  const [selectedParadaId, setSelectedParadaId] = useState(null);
   const navigate = useNavigate();
 
   // Obtener paradas desde la API
@@ -45,61 +44,62 @@ function FiltrarParada() {
 
   // Redirigir a la vista de seleccionar transporte
   const handleParadaSelect = (paradaId) => {
-    setSelectedParadaId(paradaId); // Actualiza el estado con la parada seleccionada
     navigate(`/seleccionarTransporte/${paradaId}`);
   };
 
   return (
-    <>
-    <Navbar logoSrc="../src/assets/logoLetra.png" altText="Logo" />
-    <Container className="mt-4">
-      {/* Mensaje de error */}
-      {error && <Alert variant="danger">{error}</Alert>}
+    <div className="d-flex flex-column min-vh-100">
+      <Navbar logoSrc="../src/assets/logoLetra.png" altText="Logo" />
+      <div className="page-container flex-grow-1">
+        <Container className="mt-4">
+          {/* Mensaje de error */}
+          {error && <Alert variant="danger">{error}</Alert>}
+          <h3 className="titulo">Busca tu Universidad</h3>
+          <Row>
+            <Col md={6} className="mx-auto">
+              <Form>
+                <Form.Group controlId="searchTerm">
+                  <InputGroup>
+                    <Form.Control
+                      type="text"
+                      placeholder="Buscar parada por nombre o ubicación..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                  </InputGroup>
+                </Form.Group>
+              </Form>
+            </Col>
+          </Row>
 
-      <Row>
-        <Col md={6} className="mx-auto">
-          <Form>
-            <Form.Group controlId="searchTerm">
-              <InputGroup>
-                <Form.Control
-                  type="text"
-                  placeholder="Buscar parada por nombre o ubicación..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </InputGroup>
-            </Form.Group>
-          </Form>
-        </Col>
-      </Row>
-
-      {/* Resultados de la búsqueda */}
-      <Row className="mt-4">
-        <Col md={6} className="mx-auto">
-          <ListGroup>
-            {filteredParadas.length > 0 ? (
-              filteredParadas.map(parada => (
-                <ListGroup.Item 
-                  key={parada._id} 
-                  action 
-                  onClick={() => handleParadaSelect(parada._id)}
-                  className="d-flex justify-content-between align-items-center"
-                >
-                  <div>
-                    <h5 className="mb-1">{parada.nombre}</h5>
-                    <small>Latitud: {parada.ubicacion.latitud}, Longitud: {parada.ubicacion.longitud}</small>
-                  </div>
-                </ListGroup.Item>
-              ))
-            ) : (
-              <ListGroup.Item>No se encontraron paradas</ListGroup.Item>
-            )}
-          </ListGroup>
-        </Col>
-      </Row>
-    </Container>
-    <Footer />
-    </>
+          {/* Resultados de la búsqueda */}
+          <Row className="mt-4">
+            <Col md={6} className="mx-auto">
+              <ListGroup>
+                {filteredParadas.length > 0 ? (
+                  filteredParadas.map(parada => (
+                    <ListGroup.Item 
+                      key={parada._id} 
+                      action 
+                      onClick={() => handleParadaSelect(parada._id)}
+                      className="d-flex justify-content-between align-items-center"
+                    >
+                      <div>
+                        <h5 className="mb-1">{parada.nombre}</h5>
+                        <small>Latitud: {parada.ubicacion.latitud}, Longitud: {parada.ubicacion.longitud}</small>
+                      </div>
+                    </ListGroup.Item>
+                  ))
+                ) : (
+                  <ListGroup.Item>No se encontraron paradas</ListGroup.Item>
+                )}
+              </ListGroup>
+            </Col>
+          </Row>
+        </Container>
+      </div>
+      <Footer />
+    </div>
   );
 }
 

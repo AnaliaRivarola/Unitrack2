@@ -6,37 +6,31 @@ body, html {
   flex-direction: column;
 }
 
-/* Contenedor principal del contenido */
-.container {
-  flex: 1; /* Hace que el contenedor principal ocupe el espacio restante */
-  margin-bottom: 20px; /* Espacio adicional para evitar que el footer tape el contenido */
-}
-
 /* Estilo general para el Footer */
 .footer {
   display: flex;
-  flex-direction: column; /* Asegura que los elementos hijos estén en columna */
-  align-items: center; /* Centra los elementos horizontalmente */
-  justify-content: center; /* Centra los elementos verticalmente */
-  height: 60px; /* Mismo tamaño que el navbar */
-  padding: 20px; /* Espaciado interno */
-  background-color: #A0D4DF; /* Color de fondo claro */
-  border-top: 1px solid #ddd; /* Línea superior para separar el footer */
-  color: white; /* Color de texto blanco */
-  flex-shrink: 0; /* Asegura que el footer no se reduzca */
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 60px;
+  padding: 20px;
+  background-color: #A0D4DF;
+  border-top: 1px solid #ddd;
+  color: white;
+  flex-shrink: 0;
   width: 100%;
 }
 
 .footer p {
-  margin: 5px 0; /* Espaciado vertical entre los párrafos */
-  font-size: 14px; /* Tamaño de fuente ajustado */
-  color: #ffff; /* Color de texto gris */
-  text-align: center; /* Centra el texto */
+  margin: 5px 0;
+  font-size: 14px;
+  color: #ffff;
+  text-align: center;
 }
 
 /* Media query para pantallas pequeñas (móviles) */
 @media (max-width: 768px) {
   .footer {
-    height: 90px; /* Ajusta la altura en móviles si es necesario */
+    height: 90px;
   }
 }
