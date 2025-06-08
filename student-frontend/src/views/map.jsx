@@ -17,6 +17,10 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 import throttle from "lodash.throttle";
 
+
+
+
+
 const socket = io("http://localhost:5000", {
   transports: ["websocket"], // Fuerza el uso de WebSockets
 });
@@ -46,7 +50,7 @@ const ChangeView = ({ center }) => {
   const map = useMap();
   useEffect(() => {
     if (map) {
-      map.setView(center);
+      map.flyTo(center, 17, { duration: 1.5 });
     }
   }, [center, map]);
 
@@ -74,6 +78,7 @@ const haversineDistance = (coords1, coords2) => {
 };
 
 export const MapView = () => {
+  const [pronostico, setPronostico] = useState([]);
     const [position, setPosition] = useState({
     lat: null,
     lng: null,
@@ -217,6 +222,41 @@ export const MapView = () => {
     }
   };
 
+useEffect(() => {
+  const fetchPronostico = async () => {
+    try {
+      const { lat, lng } = studentLocation;
+      const response = await axios.get(
+        `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lng}&units=metric&appid=909b15c8c85de82c205511363a243ec7`
+      );
+
+      const ahora = new Date();
+
+      const proximos = response.data.list
+        .map((item) => {
+          const fechaUTC = new Date(item.dt_txt);
+          return {
+            ...item,
+            localDate: new Date(fechaUTC.getTime() - fechaUTC.getTimezoneOffset() * 60000)
+          };
+        })
+        .filter((item) => item.localDate > ahora)
+        .slice(0, 2); // Primeros dos que aún no ocurrieron localmente
+
+      setPronostico(proximos);
+    } catch (err) {
+      console.error("❌ Error al obtener el pronóstico:", err);
+    }
+  };
+
+  if (studentLocation?.lat && studentLocation?.lng) {
+    fetchPronostico();
+  }
+}, [studentLocation]);
+
+
+
+
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -311,12 +351,47 @@ export const MapView = () => {
 
         {stopMarkers}
       </MapContainer>
-                <button 
-          onClick={handleSendLocation} 
-          className="floating-button"
-        >
-          Enviar mi ubicación
-        </button>
+                <button
+                  title="Solo podés enviar si estás cerca del transporte"
+                  onClick={handleSendLocation}
+                  className="floating-button"
+                  disabled={!isButtonEnabled}
+                >
+                  Enviar mi ubicación
+                </button>
+
+
+<div className="temperatura-widget">
+  {pronostico.length === 0 ? (
+    <p>🌤️ Cargando pronóstico...</p>
+  ) : (
+    pronostico.map((item, i) => (
+      <div key={item.dt_txt} className="weather-card">
+        <img
+          src={`http://openweathermap.org/img/wn/${item.weather[0].icon}@2x.png`}
+          alt="icono"
+        />
+        <div>
+          <strong>🌡️ {Math.round(item.main.temp)}°C</strong>
+          <p className="desc">🌤️ {item.weather[0].description}</p>
+          <p className="hora">
+            🕒 {i === 0 ? "Ahora" : item.localDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          </p>
+        </div>
+      </div>
+    ))
+  )}
+</div>
+
+
+
+
+
+<div className="map-legend">
+  <div><img src={markerIcon} alt="Bus" /> Transporte</div>
+  <div><img src={studentIcon} alt="Estudiante" /> Estudiante</div>
+  <div><img src={paradaIcon} alt="Parada" /> Parada</div>
+</div>
 
       <Footer />
     </div>

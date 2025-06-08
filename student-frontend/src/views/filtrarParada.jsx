@@ -5,6 +5,7 @@ import "../styles/filtrarParada.css";
 import { Navbar } from 'shared-frontend/components/Navbar';
 import { Footer } from 'shared-frontend/components/Footer';
 import { Container, Row, Col, Form, InputGroup, ListGroup, Alert } from 'react-bootstrap';
+import { FaUniversity, FaSearchLocation } from "react-icons/fa";
 
 function FiltrarParada() {
   const [paradas, setParadas] = useState([]);
@@ -13,7 +14,6 @@ function FiltrarParada() {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  // Obtener paradas desde la API
   useEffect(() => {
     axios.get('http://localhost:5000/api/paradas')
       .then(response => {
@@ -26,7 +26,6 @@ function FiltrarParada() {
       });
   }, []);
 
-  // Filtrar las paradas
   useEffect(() => {
     if (searchTerm === '') {
       setFilteredParadas(paradas);
@@ -42,7 +41,6 @@ function FiltrarParada() {
     }
   }, [searchTerm, paradas]);
 
-  // Redirigir a la vista de seleccionar transporte
   const handleParadaSelect = (paradaId) => {
     navigate(`/seleccionarTransporte/${paradaId}`);
   };
@@ -51,42 +49,43 @@ function FiltrarParada() {
     <div className="d-flex flex-column min-vh-100">
       <Navbar logoSrc="../src/assets/logoLetra.png" altText="Logo" />
       <div className="page-container flex-grow-1">
-        <Container className="mt-4">
-          {/* Mensaje de error */}
+        <Container className="mt-4 mb-5">
           {error && <Alert variant="danger">{error}</Alert>}
-          <h3 className="titulo">Busca tu Universidad</h3>
-          <Row>
-            <Col md={6} className="mx-auto">
-              <Form>
-                <Form.Group controlId="searchTerm">
-                  <InputGroup>
-                    <Form.Control
-                      type="text"
-                      placeholder="Buscar parada por nombre o ubicación..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                  </InputGroup>
-                </Form.Group>
-              </Form>
-            </Col>
-          </Row>
+          
+          <h3 className="titulo mb-4">
+            <FaSearchLocation className="me-2 text-primary" />
+            Busca tu Universidad
+          </h3>
 
-          {/* Resultados de la búsqueda */}
-          <Row className="mt-4">
-            <Col md={6} className="mx-auto">
-              <ListGroup>
+          <Row className="justify-content-center">
+            <Col xs={12} sm={10} md={8}>
+              <InputGroup className="mb-4 shadow-sm">
+                <Form.Control
+                  type="text"
+                  placeholder="Ej: Universidad Nacional"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="rounded-pill px-4 py-2"
+                />
+              </InputGroup>
+
+              <ListGroup className="rounded-4 shadow-sm">
                 {filteredParadas.length > 0 ? (
                   filteredParadas.map(parada => (
                     <ListGroup.Item 
                       key={parada._id} 
                       action 
                       onClick={() => handleParadaSelect(parada._id)}
-                      className="d-flex justify-content-between align-items-center"
+                      className="d-flex align-items-start justify-content-between parada-item"
                     >
                       <div>
-                        <h5 className="mb-1">{parada.nombre}</h5>
-                        <small>Latitud: {parada.ubicacion.latitud}, Longitud: {parada.ubicacion.longitud}</small>
+                        <h5 className="mb-1">
+                          <FaUniversity className="me-2 text-secondary" />
+                          {parada.nombre}
+                        </h5>
+                        <small className="text-muted">
+                          Lat: {parada.ubicacion.latitud} | Lng: {parada.ubicacion.longitud}
+                        </small>
                       </div>
                     </ListGroup.Item>
                   ))

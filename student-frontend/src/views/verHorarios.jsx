@@ -2,9 +2,11 @@ import React, { useEffect, useState } from "react";
 import { Table, Container, Spinner } from "react-bootstrap";
 import { Navbar } from 'shared-frontend/components/Navbar';
 import { Footer } from 'shared-frontend/components/Footer';
+import "../styles/verHorarios.css"; // Asegúrate de que el CSS esté en la ruta correcta
 
 const HorariosDisponibles = () => {
   const [horarios, setHorarios] = useState([]);
+  const [todosHorarios, setTodosHorarios] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -12,6 +14,7 @@ const HorariosDisponibles = () => {
       .then((response) => response.json())
       .then((data) => {
         setHorarios(data);
+        setTodosHorarios(data);
         setLoading(false);
       })
       .catch((error) => {
@@ -25,13 +28,30 @@ const HorariosDisponibles = () => {
       <Navbar logoSrc="../src/assets/logoLetra.png" altText="Logo" />
       <div className="page-container flex-grow-1">
         <Container className="mt-4">
-          <h2 className="text-center mb-4">Horarios Disponibles</h2>
-          
+          <div className="text-center bg-light p-3 rounded shadow-sm mb-4">
+            <h2 className="mb-0 text-primary">📅 Horarios Disponibles</h2>
+          </div>
+
+          {!loading && (
+            <input
+              type="text"
+              className="form-control mb-3"
+              placeholder="Buscar por transporte..."
+              onChange={(e) => {
+                const texto = e.target.value.toLowerCase();
+                const filtrados = todosHorarios.filter((h) =>
+                  h.id_transporte?.nombre?.toLowerCase().includes(texto)
+                );
+                setHorarios(filtrados);
+              }}
+            />
+          )}
+
           {loading ? (
-            <div className="text-center">
-              <Spinner animation="border" variant="primary" />
-              <p>Cargando horarios...</p>
-            </div>
+            <div className="d-flex flex-column align-items-center justify-content-center" style={{ minHeight: "200px" }}>
+            <Spinner animation="border" variant="primary" />
+            <p className="mt-2">Cargando horarios...</p>
+          </div>
           ) : (
             <Table striped bordered hover responsive className="shadow">
               <thead className="bg-primary text-white">
@@ -43,21 +63,21 @@ const HorariosDisponibles = () => {
                 </tr>
               </thead>
               <tbody>
-              {horarios && horarios.length > 0 ? (
-                horarios.map((horario) => (
+                {horarios.length > 0 ? (
+                  horarios.map((horario) => (
                     <tr key={horario._id}>
-                    <td>{horario.id_transporte?.nombre || "Sin datos"}</td> {/* Mostrar nombre del transporte */}
-                    <td>{horario.hora_salida || "Sin datos"}</td>
-                    <td>{horario.hora_regreso || "Sin datos"}</td>
-                    <td>{horario.origen || "Sin datos"}</td>
+                      <td>{horario.id_transporte?.nombre || <td className="text-muted fst-italic">No disponible</td>}</td>
+                      <td>{horario.hora_salida || <td className="text-muted fst-italic">No disponible</td>}</td>
+                      <td>{horario.hora_regreso || <td className="text-muted fst-italic">No disponible</td>}</td>
+                      <td>{horario.origen || <td className="text-muted fst-italic">No disponible</td>}</td>
                     </tr>
-                ))
+                  ))
                 ) : (
-                <tr>
+                  <tr>
                     <td colSpan="4" className="text-center">
-                    No hay horarios disponibles.
+                      No hay horarios disponibles.
                     </td>
-                </tr>
+                  </tr>
                 )}
               </tbody>
             </Table>

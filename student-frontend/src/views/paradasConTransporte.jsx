@@ -1,24 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Container, Row, Col, ListGroup, Spinner, Alert } from 'react-bootstrap';
+import { Container, Row, Col, Card, Spinner, Alert, Badge } from 'react-bootstrap';
 import { Navbar } from 'shared-frontend/components/Navbar';
 import { Footer } from 'shared-frontend/components/Footer';
-
+import "../styles/paradasConTransporte.css";
 
 const ParadasConTransporte = () => {
-  const [paradas, setParadas] = useState([]); // Estado para almacenar las paradas con transportes
-  const [loading, setLoading] = useState(true); // Estado para mostrar el spinner
-  const [error, setError] = useState(null); // Estado para manejar errores
+  const [paradas, setParadas] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchParadasConTransportes = async () => {
       try {
         setLoading(true);
         setError(null);
-
-        // Llamada a la API para obtener las paradas con transportes vinculados
         const response = await axios.get('http://localhost:5000/api/paradas-con-transportes');
-        setParadas(response.data); // Guardamos los datos en el estado
+        setParadas(response.data);
         setLoading(false);
       } catch (err) {
         setError('Error al cargar las paradas con transportes. Intenta nuevamente.');
@@ -31,47 +29,58 @@ const ParadasConTransporte = () => {
 
   return (
     <>
-    <Navbar logoSrc="../src/assets/logoLetra.png" altText="Logo" />
-    <Container className="mt-4">
-      <Row>
-        <Col md={8} className="mx-auto">
-          <h3 className="text-center">Paradas con Transportes Vinculados</h3>
-          <p className="text-center">Aquí puedes ver las paradas y los transportes asociados a cada una.</p>
+      <Navbar logoSrc="../src/assets/logoLetra.png" altText="Logo" />
+      <Container className="mt-4 mb-5">
+        <h2 className="text-center mb-3">🚏 Paradas con Transportes</h2>
+        <p className="text-center text-muted mb-4">Visualiza las paradas y los transportes disponibles para cada una.</p>
 
-          {loading && <Spinner animation="border" variant="primary" className="d-block mx-auto" />}
-          {error && <Alert variant="danger">{error}</Alert>}
+        {loading && (
+          <div className="text-center my-5">
+            <Spinner animation="border" variant="primary" />
+            <p className="mt-2">Cargando paradas...</p>
+          </div>
+        )}
 
-          {!loading && !error && (
-            <ListGroup>
-              {paradas.length > 0 ? (
-                paradas.map((parada) => (
-                  <ListGroup.Item key={parada._id} className="mb-3">
-                    <h5>{parada.nombre}</h5>
-                    <p><strong>Ubicación:</strong> Latitud {parada.ubicacion.latitud}, Longitud {parada.ubicacion.longitud}</p>
-                    <p><strong>Transportes:</strong></p>
-                    <ListGroup>
+        {error && <Alert variant="danger">{error}</Alert>}
+
+        {!loading && !error && (
+          <Row xs={1} md={2} lg={3} className="g-4">
+            {paradas.length > 0 ? (
+              paradas.map((parada) => (
+                <Col key={parada._id}>
+                  <Card className="h-100 shadow-sm border-0">
+                    <Card.Body>
+                      <Card.Title className="">{parada.nombre}</Card.Title>
+                      <Card.Text className="mb-2">
+                        📍 <strong>Ubicación:</strong><br />
+                        Lat: {parada.ubicacion.latitud} <br />
+                        Lng: {parada.ubicacion.longitud}
+                      </Card.Text>
+                      <Card.Text>
+                        <strong>Transportes disponibles:</strong>
+                      </Card.Text>
                       {parada.transportes.length > 0 ? (
                         parada.transportes.map((transporte) => (
-                          <ListGroup.Item key={transporte._id} className="mb-2">
+                          <Badge key={transporte._id} bg="info" className="me-2 mb-2 fs-6">
                             🚍 {transporte.nombre}
-                          </ListGroup.Item>
+                          </Badge>
                         ))
                       ) : (
-                        <ListGroup.Item>No hay transportes vinculados a esta parada.</ListGroup.Item>
+                        <p className="text-muted fst-italic">No hay transportes vinculados.</p>
                       )}
-                    </ListGroup>
-                  </ListGroup.Item>
-                ))
-              ) : (
-                <Alert variant="info">No hay paradas disponibles.</Alert>
-              )}
-            </ListGroup>
-          )}
-        </Col>
-      </Row>
-    </Container>
-
-    <Footer />
+                    </Card.Body>
+                  </Card>
+                </Col>
+              ))
+            ) : (
+              <Alert variant="info" className="text-center w-100">
+                No hay paradas disponibles.
+              </Alert>
+            )}
+          </Row>
+        )}
+      </Container>
+      <Footer />
     </>
   );
 };

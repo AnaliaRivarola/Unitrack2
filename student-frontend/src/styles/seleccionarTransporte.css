@@ -1,42 +1,27 @@
-/* seleccionarTransportes.css */
-
-/* Contenedor principal */
 .page-container {
-    padding-top: 80px;
-  }
-  
-  /* Estilos para la lista de transportes */
-  .transport-list {
-    margin: 20px;
-    padding: 10px;
-    text-align: center;
-  }
-  
-  .transport-list h3 {
-    font-size: 1.2rem;
-    margin-bottom: 10px;
-  }
-  
-  .transport-list ul {
-    padding: 0;
-    margin: 0;
-    list-style: none;
-  }
-  
-  .transport-list li {
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
-  }
-  .footer {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 60px;
-    padding: 20px;
-    background-color: #A0D4DF;
-    border-top: 1px solid #ddd;
-    color: white;
-    width: 100%;
-  }  
-  
+  padding-top: 80px;
+  animation-duration: 1s;
+}
+
+.list-item-custom {
+  padding: 15px;
+  border-radius: 12px;
+  border: 1px solid #e0e0e0;
+  transition: background-color 0.3s ease;
+  background-color: #f8f9fa;
+}
+
+.list-item-custom:hover {
+  background-color: #e0f7ff;
+}
+
+.bus-icon {
+  font-size: 1.8rem;
+  color: #007bff;
+}
+
+.btn-ir-mapa {
+  width: 100%;
+  max-width: 100px;
+  margin-top: 20px;
+}

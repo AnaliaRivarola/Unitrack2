@@ -25,6 +25,82 @@
     cursor: not-allowed;
 }
 
+.map-legend {
+  position: absolute;
+  bottom: 10px; /* ↓ se mantiene abajo */
+  left: 10px;
+  width: 210px; 
+  background: rgba(255, 255, 255, 0.9);
+  padding: 10px;
+  border-radius: 8px;
+  z-index: 999;
+}
+
+.map-legend h4 {
+  margin: 0 0 10px;
+  font-size: 18px;
+  color: #333;
+  padding-left: 10;
+}
+
+.map-legend img {
+  width: 20px;
+  margin-right: 8px;
+  vertical-align: middle;
+  
+}
+
+.temperatura-widget {
+  position: absolute;
+  bottom: 130px; /* arriba de la leyenda */
+  left: 10px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 10px;
+  padding: 10px;
+  z-index: 999;
+  width: 210px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.weather-card {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.weather-card img {
+  width: 35px;
+  height: 35px;
+  margin-right: 8px;
+}
+
+.weather-card strong {
+  font-size: 16px;
+  color: #333;
+}
+
+.weather-card .desc {
+  font-size: 13px;
+  margin: 0;
+  color: #666;
+  text-transform: capitalize;
+}
+
+.weather-card .hora {
+  font-size: 12px;
+  margin: 0;
+  color: #999;
+}
+
+.weather-card p {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: block;
+}
+
+
+
 /* Media query para dispositivos móviles */
 @media (max-width: 768px) {
     .floating-button {

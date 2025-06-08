@@ -1,0 +1,68 @@
+/* Contenedor general */
+.container {
+  max-width: 1140px;
+}
+
+/* Título */
+h2.text-primary {
+  font-weight: 600;
+  font-size: 2rem;
+}
+
+/* Card */
+.card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border-radius: 12px;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+.card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.card-text {
+  font-size: 0.95rem;
+}
+
+/* Badge para transporte */
+.badge {
+  font-size: 0.9rem;
+  padding: 0.5em 0.75em;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+/* Spinner y mensaje de carga */
+.text-center .spinner-border {
+  width: 3rem;
+  height: 3rem;
+}
+
+.text-center p {
+  margin-top: 0.5rem;
+  color: #555;
+}
+
+/* Alertas */
+.alert-info,
+.alert-danger {
+  font-size: 1rem;
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+/* Responsivo adicional para texto */
+@media (max-width: 576px) {
+  .card-title {
+    font-size: 1.1rem;
+  }
+
+  .card-text {
+    font-size: 0.9rem;
+  }
+}

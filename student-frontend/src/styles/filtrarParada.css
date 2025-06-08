@@ -1,109 +1,40 @@
-/* filtrarParada.css */
-
-/* Asegura que el body y el html ocupen toda la altura */
 body, html {
   height: 100%;
   margin: 0;
-  display: flex;
-  flex-direction: column;
+  font-family: 'Segoe UI', sans-serif;
 }
-/* Asegura que el contenedor principal ocupe el espacio restante */
-/* Contenedor principal de la página */
+
+/* Layout general */
 .page-container {
   flex: 1;
   display: flex;
   flex-direction: column;
 }
 
-/* Estilos para el buscador */
-.search-container {
-  margin: 20px;
-  padding: 10px;
+/* Título centrado */
+.titulo {
   text-align: center;
+  font-weight: bold;
+  color: #0d6efd;
 }
 
-.search-container input {
-  padding: 10px;
-  width: 100%;
-  max-width: 400px;
-  margin-bottom: 10px;
-  border: 0.5px solid #A0D4DF;
-  border-radius: 20px;
-  background-color: rgba(160, 212, 223, 0.3); /* 30% de transparencia */
+/* Estilo de cada ítem de parada */
+.parada-item {
+  padding: 1rem;
+  border-radius: 0.75rem;
+  transition: background-color 0.2s ease-in-out;
 }
 
-.search-results {
-  margin-top: 10px;
+.parada-item:hover {
+  background-color: rgba(13, 110, 253, 0.1);
 }
 
-.search-results ul {
-  padding: 0;
-  margin: 0;
-  list-style: none;
-}
-
-.search-results li {
-  padding: 5px;
-  border-bottom: 1px solid #ddd;
-}
-
-.transport-list {
-  margin-top: 20px;
-}
-
-.transport-list h3 {
-  font-size: 1.2rem;
-  text-align: center;
-}
-
-.transport-list ul {
-  text-align: left;
-}
-
-/* Footer */
-/* Footer */
-.footer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 60px;
-  padding: 20px;
-  background-color: #A0D4DF;
-  border-top: 1px solid #ddd;
-  color: white;
-  flex-shrink: 0;
-  width: 100%;
-}
-.titulo{
-  text-align: center;
-}
-.search-results .search-item {
-  display: flex;
-  flex-direction: column; /* Asegura que los elementos estén uno debajo del otro */
-  padding: 10px;
-  border-bottom: 1px solid #ddd;
-  cursor: pointer;
-}
-
-.search-results .parada-nombre {
-  font-weight: bold; /* Hacer el nombre más destacado */
-  margin-bottom: 5px; /* Separar nombre de la ubicación */
-}
-
-.search-results .parada-ubicacion {
-  color: #555; /* Color más tenue para la ubicación */
-}
-
-.search-results .search-item:hover {
-  background-color: rgba(160, 212, 223, 0.3); /* Color al pasar el cursor por encima */
-}
-
+/* Ajustes responsive */
 @media (max-width: 768px) {
-  .search-container input {
-    max-width: 90%;
+  .titulo {
+    font-size: 1.2rem;
   }
-  footer {
-    height: 90px; /* Ajusta la altura en móviles si es necesario */
+  .parada-item h5 {
+    font-size: 1rem;
   }
 }
