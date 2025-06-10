@@ -5,7 +5,7 @@ import { Footer } from 'shared-frontend/components/Footer';
 export const Normas = () => {
   return (
     <div className="d-flex flex-column min-vh-100">
-      <Navbar logoSrc="../src/assets/logoLetra.png" altText="Logo" />
+      <Navbar logoSrc="/public/logoLetra.png" altText="Logo" />
       <div className="page-container flex-grow-1">
       <h1 className="text-center mb-4">Normas de Uso de la Aplicación</h1>
         <div className="container my-5">

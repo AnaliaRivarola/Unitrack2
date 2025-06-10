@@ -47,7 +47,7 @@ function FiltrarParada() {
 
   return (
     <div className="d-flex flex-column min-vh-100">
-      <Navbar logoSrc="../src/assets/logoLetra.png" altText="Logo" />
+      <Navbar logoSrc="/public/logoLetra.png" altText="Logo" />
       <div className="page-container flex-grow-1">
         <Container className="mt-4 mb-5">
           {error && <Alert variant="danger">{error}</Alert>}

@@ -29,7 +29,7 @@ const ParadasConTransporte = () => {
 
   return (
     <>
-      <Navbar logoSrc="../src/assets/logoLetra.png" altText="Logo" />
+      <Navbar logoSrc="/public/logoLetra.png" altText="Logo" />
       <Container className="mt-4 mb-5">
         <h2 className="text-center mb-3">🚏 Paradas con Transportes</h2>
         <p className="text-center text-muted mb-4">Visualiza las paradas y los transportes disponibles para cada una.</p>

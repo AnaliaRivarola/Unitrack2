@@ -5,7 +5,7 @@ export const Navbar = ({ logoSrc, altText, children }) => {
   return (
     <nav className="navbar px-3">
       <div className="container-fluid d-flex justify-content-center align-items-center">
-        <a className="navbar-brand d-flex align-items-center" href="#">
+        <a className="navbar-brand d-flex align-items-center" href="/mapa">
           <img
             src={logoSrc}
             alt={altText}

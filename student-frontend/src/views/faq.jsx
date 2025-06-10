@@ -5,7 +5,7 @@ import { Footer } from 'shared-frontend/components/Footer';
 export const FAQ = () => {
   return (
     <>
-    <Navbar logoSrc="../src/assets/logoLetra.png" altText="Logo" />
+    <Navbar logoSrc="/public/logoLetra.png" altText="Logo" />
     <div className="container my-5">
       <h1 className="text-center mb-4">Preguntas Frecuentes (FAQ)</h1>
       <div className="accordion" id="faqAccordion">

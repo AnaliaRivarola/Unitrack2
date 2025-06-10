@@ -1,21 +1,26 @@
 import React, { useEffect, useState, useRef, useMemo } from "react";
 import { Navbar } from 'shared-frontend/components/Navbar';
 import { Footer } from 'shared-frontend/components/Footer';
+//Importar los componentes necesarios de Leaflet
 import { MapContainer, TileLayer, Marker, Popup, useMap, Circle } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import io from "socket.io-client";
 import L from "leaflet";
 import { Modal, Button } from "react-bootstrap";
 import ChoferEsperaModal from "../components/modal/choferEspera";
-import { MensajeModal } from "../components/modal/mensajeChofer"; // 📌 Importa el modal
-import markerIcon from "../assets/icono2.png"; 
-import studentIcon from "../assets/student.png"; 
-import paradaIcon from "../assets/parada.png";
+import { MensajeModal } from "../components/modal/mensajeChofer"; 
+import markerIcon from "/public/icono2.png"; 
+import studentIcon from "/public/student.png"; 
+import paradaIcon from "/public/parada.png";
 import Sidebar from "./sideBar"; 
 import '../styles/mapa.css';  
 import axios from "axios";  
 import { useParams } from "react-router-dom";
 import throttle from "lodash.throttle";
+//para usar leaflet-routing-machine
+import 'leaflet-routing-machine';
+import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
+
 
 
 
@@ -91,6 +96,8 @@ export const MapView = () => {
   const [stops, setStops] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [accuracy, setAccuracy] = useState(0); // Estado para la precisión
+  const [distanciaTransporteEstudiante, setDistanciaTransporteEstudiante] = useState(null);
+
 
   // 📌 Estado para manejar el mensaje recibido del chofer
   const [mensajeChofer, setMensajeChofer] = useState("");
@@ -99,6 +106,82 @@ export const MapView = () => {
   // Eliminamos el estado y la lógica de `selectedTransporte`
   const [isButtonEnabled, setIsButtonEnabled] = useState(false);
   const markerRef = useRef(null); // Ref para el marcador
+  
+  // Ref para el control de enrutamiento
+  const [closestStop, setClosestStop] = useState(null);
+  const routingControlRef = useRef(null);
+  const mapRef = useRef();
+
+  const [mostrarRuta, setMostrarRuta] = useState(false);
+
+  //calculo de la distancia entre el transporte y el estudiante
+  useEffect(() => {
+  if (position && studentLocation && position.lat && studentLocation.lat) {
+    const distancia = haversineDistance(studentLocation, position); // función que ya tenés
+    setDistanciaTransporteEstudiante(distancia);
+  }
+}, [position, studentLocation]);
+
+  //Calculo para el enrutamiento
+  useEffect(() => {
+  if (!position || !position.lat || !stops.length) return;
+
+  let minDistance = Infinity;
+  let nearest = null;
+
+  stops.forEach((stop) => {
+    const distance = haversineDistance(
+      { lat: position.lat, lng: position.lng },
+      { lat: stop.ubicacion.latitud, lng: stop.ubicacion.longitud }
+    );
+
+    if (distance < minDistance) {
+      minDistance = distance;
+      nearest = stop;
+    }
+  });
+
+  if (nearest && (!closestStop || closestStop._id !== nearest._id)) {
+    setClosestStop(nearest);
+  }
+}, [position, stops]);
+
+useEffect(() => {
+  if (!mapRef.current) return;
+  const map = mapRef.current;
+
+  if (routingControlRef.current) {
+    routingControlRef.current.remove();
+    routingControlRef.current = null;
+  }
+
+  if (!position || !closestStop || !mostrarRuta) return;
+
+  const control = L.Routing.control({
+    waypoints: [
+      L.latLng(position.lat, position.lng),
+      L.latLng(closestStop.ubicacion.latitud, closestStop.ubicacion.longitud)
+    ],
+    createMarker: () => null,
+    addWaypoints: false,
+    routeWhileDragging: false,
+    draggableWaypoints: false,
+    show: false,
+  }).addTo(map);
+
+  routingControlRef.current = control;
+
+  return () => {
+    if (routingControlRef.current) {
+      routingControlRef.current.remove();
+      routingControlRef.current = null;
+    }
+  };
+}, [position, closestStop, mostrarRuta]);
+
+
+
+
 
   useEffect(() => {
     socket.on("choferEsperara", () => {
@@ -311,7 +394,7 @@ useEffect(() => {
 
   return (
     <>
-     <Navbar logoSrc="../src/assets/logoLetra.png" altText="Logo" />
+     <Navbar logoSrc="/public/logoLetra.png" altText="Logo" />
     <div>
       <ChoferEsperaModal show={showModal} setShow={setShowModal} />
       
@@ -322,7 +405,12 @@ useEffect(() => {
         mensaje={mensajeChofer} 
       />
 
-      <MapContainer key={`${position.lat}-${position.lng}`} center={position} zoom={70} style={{ height: "calc(100vh - 60px)", width: "100%" }}>
+      <MapContainer eventHandlers={{
+    click: () => {
+      setMostrarRuta(true);
+    }
+  }}  ref={mapRef} key={`${position.lat}-${position.lng}`} center={position} zoom={70} style={{ height: "calc(100vh - 60px)", width: "100%" }}>
+       
         <Sidebar />
         <ChangeView center={position} />
         <TileLayer
@@ -330,13 +418,23 @@ useEffect(() => {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
                 {position.transporteDisponible && (
-          <Marker position={position} icon={busIcon} ref={markerRef}>
+          <Marker
+            position={position}
+            icon={busIcon}
+            ref={markerRef}
+            eventHandlers={{
+              click: () => {
+                setMostrarRuta(prev => !prev); // Toggle
+              }
+            }}
+          >
             <Popup>
               {noData
                 ? "⚠️ Sin actualización de ubicación"
                 : `🚍  Nombre del Transporte: ${position.nombreTransporte}`}
             </Popup>
           </Marker>
+
         )}
 
 
@@ -351,6 +449,18 @@ useEffect(() => {
 
         {stopMarkers}
       </MapContainer>
+
+      {closestStop && (
+        <div className="closest-stop-label">
+          Próxima parada: <strong>{closestStop.nombre}</strong>
+        </div>
+        
+      )}
+      {distanciaTransporteEstudiante !== null && (
+        <div className="distance-label">
+          Distancia al transporte: <strong>{Math.round(distanciaTransporteEstudiante)} m</strong>
+        </div>
+      )}
                 <button
                   title="Solo podés enviar si estás cerca del transporte"
                   onClick={handleSendLocation}

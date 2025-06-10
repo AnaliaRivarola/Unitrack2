@@ -3,6 +3,7 @@ const Transporte = require('../models/transporte.models');
 const Parada = require('../models/parada.models');
 const Auditoria = require('../models/auditoria.models');
 const GPS = require('../models/gps.models');
+
 // Crear un nuevo transporte
 exports.createTransporte = async (req, res) => {
   try {
@@ -207,5 +208,22 @@ exports.obtenerTransporteConGps = async (req, res) => {
   } catch (error) {
     console.error('Error al obtener transporte con GPS:', error);
     res.status(500).json({ message: 'Error al obtener transporte con GPS', error: error.message });
+  }
+};
+
+// Obtener las paradas asociadas a un transporte
+exports. getParadasPorTransporte = async (req, res) => {
+  try {
+    const transporte = await Transporte.findById(req.params.id).populate('paradas.parada');
+
+    if (!transporte) {
+      return res.status(404).json({ mensaje: 'Transporte no encontrado' });
+    }
+
+    const paradas = transporte.paradas.map(p => p.parada);
+    res.json(paradas);
+  } catch (error) {
+    console.error('Error al obtener paradas del transporte:', error);
+    res.status(500).json({ mensaje: 'Error al obtener las paradas' });
   }
 };

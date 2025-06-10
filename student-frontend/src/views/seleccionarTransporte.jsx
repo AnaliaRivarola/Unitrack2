@@ -38,7 +38,7 @@ function SeleccionarTransportes() {
 
   return (
     <div className="d-flex flex-column min-vh-100">
-      <Navbar logoSrc="../src/assets/logoLetra.png" altText="Logo" />
+      <Navbar logoSrc="/public/logoLetra.png" altText="Logo" />
       <div className="page-container flex-grow-1 animate__animated animate__fadeIn">
         <Container className="mt-4">
           {error && <Alert variant="danger">{error}</Alert>}

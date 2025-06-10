@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import welcomeImage from '../assets/welcome.png';
+import welcomeImage from '/public/welcome.png';
 import '../styles/welcome.css'; 
 
 export const Welcome = () => {

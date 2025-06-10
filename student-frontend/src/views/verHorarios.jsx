@@ -25,7 +25,7 @@ const HorariosDisponibles = () => {
 
   return (
     <div className="d-flex flex-column min-vh-100">
-      <Navbar logoSrc="../src/assets/logoLetra.png" altText="Logo" />
+      <Navbar logoSrc="/public/logoLetra.png" altText="Logo" />
       <div className="page-container flex-grow-1">
         <Container className="mt-4">
           <div className="text-center bg-light p-3 rounded shadow-sm mb-4">

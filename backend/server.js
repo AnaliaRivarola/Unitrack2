@@ -80,7 +80,7 @@ app.use('/api', usuariosRoutes);
 app.use('/api/gps', gpsRoutes); // Registra las rutas bajo el prefijo /api/gps
 app.use('/api', gpsRoutes); // Registra las rutas bajo el prefijo /api
 app.use("/api", contactoRoutes);
-
+app.use('/api/transportes', transporteRoutes); // Rutas de transporte
 app.use('/api/protected-route', authenticateJWT, (req, res) => {
   res.json({ message: 'Ruta protegida' });
 });

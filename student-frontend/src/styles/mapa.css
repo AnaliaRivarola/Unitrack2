@@ -99,6 +99,32 @@
   display: block;
 }
 
+.closest-stop-label {
+  position: absolute;
+  top: 100px;
+  right: 20px;
+  background-color: rgba(160, 212, 223, 0.9);
+  padding: 10px 15px;
+  border-radius: 10px;
+  font-weight: bold;
+  color: #000;
+  z-index: 1000;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+
+.distance-label {
+  position: absolute;
+  top: 150px;
+  right: 20px;
+  background-color: rgba(160, 212, 223, 0.9);
+  padding: 10px 15px;
+  border-radius: 10px;
+  font-weight: bold;
+  color: #000;
+  z-index: 1000;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+
 
 
 /* Media query para dispositivos móviles */

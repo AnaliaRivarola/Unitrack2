@@ -58,4 +58,8 @@ router.post('/asociar-gps', TransporteController.asociarGpsATransporte);
 
 // Ruta para obtener un transporte con su GPS asociado
 router.get('/:transporteId/gps', TransporteController.obtenerTransporteConGps);
+
+router.get('/:id/paradas', TransporteController.getParadasPorTransporte);
+
+
 module.exports = router;

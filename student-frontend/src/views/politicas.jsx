@@ -5,7 +5,7 @@ import { Footer } from 'shared-frontend/components/Footer';
 export const Politicas = () => {
   return (
     <>
-      <Navbar logoSrc="../src/assets/logoLetra.png" altText="Logo" />
+      <Navbar logoSrc="/public/logoLetra.png" altText="Logo" />
       <div className="container my-5">
         <h1 className="text-center mb-4">Política de Privacidad</h1>
         <p className="text-center text-muted">Última actualización: [23 de marzo del 2025]</p>

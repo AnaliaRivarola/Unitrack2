@@ -31,7 +31,7 @@ export const Contacto = () => {
 
   return (
     <>
-      <Navbar logoSrc="../src/assets/logoLetra.png" altText="Logo" />
+      <Navbar logoSrc="/public/logoLetra.png" altText="Logo" />
       <div className="container my-5">
         <div className="row justify-content-center">
           <div className="col-lg-8 col-md-10">
